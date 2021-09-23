@@ -150,7 +150,4 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         for answ  in self.answers_group.findChildren(QTextEdit):
             answers.append(answ.toPlainText())
 
-        return [title, scenario, objectives, injects, questions, weights, answers]
-
-        
-  
+        return [title, scenario, objectives, injects, questions, answers, weights]

@@ -23,6 +23,15 @@ def execute_query(cnx, query):
         print(e)
 
 
+def execute_query_var(cnx, query, var):
+    try:
+        cursor = cnx.cursor()
+        cursor.execute(query, var)
+        cnx.commit()
+    except Error as e:
+        print(e)
+
+
 def fetch_query(cnx, query):
     data = None
 
@@ -36,3 +45,14 @@ def fetch_query(cnx, query):
     return data
 
 
+def fetch_query_var(cnx, query, var):
+    data = None
+
+    try:
+        cursor = cnx.cursor()
+        data = cursor.execute(query, var).fetchall()
+        return data
+    except Error as e:
+        print(e)
+
+    return data
