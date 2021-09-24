@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from src.uic.main_window import Ui_MainWindow
 from src.views.create_scenario_view import CreateScenario
-from lite import Database
+from src.lite import Database
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
