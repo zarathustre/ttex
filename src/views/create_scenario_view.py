@@ -13,6 +13,7 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
     def init_widgets(self):
         self.create_scenario_tab.setCurrentIndex(0)
         self.question_combo_box.setFixedWidth(50)
+        # Add integers 1 to 10 to the weight combobox
         for i in range(10):
             self.question_combo_box.addItem(str(i+1))
 
@@ -29,7 +30,7 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         self.remove_answer_button.clicked.connect(lambda: self.remove_answer())
         self.clear_button.clicked.connect(lambda: self.clear_text())
 
-
+    # Clear the input fields of the current tab
     def clear_text(self):
         tab = self.create_scenario_tab.currentWidget()
         if tab.objectName() == 'tab_1':
@@ -42,7 +43,7 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         for child in children:
             child.clear()
         
-
+    # Add an input for the objective field
     def add_objective(self):
         count = len(self.objectives_group.findChildren(QTextEdit))
         if count < 5:
@@ -53,13 +54,14 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
             self.objectives_edit.setFocus()
             self.setTabOrder(self.objectives_group.findChildren(QTextEdit)[-2], self.objectives_group.findChildren(QTextEdit)[-1])
 
+    # Remove added input for the objective field
     def remove_objective(self):
         children = self.objectives_group.findChildren(QTextEdit)
         if len(children) > 1:  
             children[-1].deleteLater()
             children[-2].setFocus()
 
-
+    # Add an input for the inject field
     def add_inject(self):
         count = len(self.injects_group.findChildren(QTextEdit))
         if count < 5:
@@ -70,31 +72,35 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
             self.injects_edit.setFocus()
             self.setTabOrder(self.injects_group.findChildren(QTextEdit)[-2], self.injects_group.findChildren(QTextEdit)[-1])
 
+    # Remove added input for the inject field
     def remove_inject(self):
         children = self.injects_group.findChildren(QTextEdit)
         if len(children) > 1:  
             children[-1].deleteLater()
             children[-2].setFocus()
 
-
+    # Add an input question field and a weight combobox
     def add_question(self):
         count = len(self.questions_group.findChildren(QTextEdit))
         if count < 5:
-            self.question_edit = QTextEdit(self.questions_group)
-            self.question_edit.setObjectName(f"question_edit_{count}")
-            self.horizontalLayout = QHBoxLayout()
-            self.horizontalLayout.addWidget(self.question_edit)
-            self.question_combo_box = QComboBox(self.questions_group)
-            self.question_combo_box.setObjectName(f"question_combo_box_{count}")
-            self.question_combo_box.setFixedWidth(50)
-            self.horizontalLayout.addWidget(self.question_combo_box)
-            self.verticalLayout_6.addLayout(self.horizontalLayout)
+            self.question_edit = QTextEdit(self.questions_group)                    # question text edit
+            self.question_edit.setObjectName(f"question_edit_{count}")              # set object name
+            self.horizontalLayout = QHBoxLayout()                                   # layout
+            self.horizontalLayout.addWidget(self.question_edit)                     # add wiget to layout
+            self.question_combo_box = QComboBox(self.questions_group)               # weight combobox
+            self.question_combo_box.setObjectName(f"question_combo_box_{count}")    # set object name
+            self.question_combo_box.setFixedWidth(50)                               # fixed width
+            self.horizontalLayout.addWidget(self.question_combo_box)                # add wiget
+            self.verticalLayout_6.addLayout(self.horizontalLayout)                  # add wiget to layout        
             self.question_edit.setTabChangesFocus(True)
             self.question_edit.setFocus()
+            # set tab button to change focus between fields
             self.setTabOrder(self.questions_group.findChildren(QTextEdit)[-2], self.questions_group.findChildren(QTextEdit)[-1])
+            # add integers 1 to 10 to the weight combobox
             for i in range(10):
                 self.question_combo_box.addItem(str(i+1))
-            
+
+    # Remove an added input for the question / weight fields     
     def remove_question(self):
         text_children = self.questions_group.findChildren(QTextEdit)
         combo_children = self.questions_group.findChildren(QComboBox)
@@ -103,7 +109,7 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
             combo_children[-1].deleteLater()
             text_children[-2].setFocus()
 
-
+    # Add an input for the answer field
     def add_answer(self):
         count = len(self.answers_group.findChildren(QTextEdit))
         if count < 5:
@@ -114,13 +120,14 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
             self.answer_edit.setFocus()
             self.setTabOrder(self.answers_group.findChildren(QTextEdit)[-2], self.answers_group.findChildren(QTextEdit)[-1])
 
+    # Remove an added input for the answer field
     def remove_answer(self):
         children = self.answers_group.findChildren(QTextEdit)
         if len(children) > 1:  
             children[-1].deleteLater()
             children[-2].setFocus()
 
-
+    # Returns the values in the input text fields
     def get_values(self):
         title = self.title_edit.text()
         scenario = self.scenario_edit.toPlainText()
