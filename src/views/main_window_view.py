@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from src.uic.main_window import Ui_MainWindow
-from src.views.create_scenario_view import CreateScenario
+from .create_scenario_view import CreateScenario
+from .start_scenario_view import StartScenario
 from src.lite import Database
 
 
@@ -14,25 +15,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def assign_widgets(self):
         self.create_scenario_button.clicked.connect(lambda: self.create_scenario())
+        self.start_scenario_button.clicked.connect(lambda: self.start_scenario())
+
+
+    def start_scenario(self):
+        self.scenario_start = StartScenario()
+        self.main_stack.addWidget(self.scenario_start)
+        self.main_stack.setCurrentIndex(1)
+
+        # assign widgets
+        self.scenario_start.back_button.clicked.connect(lambda: clear_and_back())
+
+        # TODO fix the back button functionality to be more dynamic by changing to the previous page instead of home page
+
+        def clear_and_back():
+            self.main_stack.setCurrentIndex(0)
+            self.scenario_start.deleteLater()
 
 
     # Handles the creation of a new scenario
     def create_scenario(self):
         #region
-        self.scenario = CreateScenario()              # create scenario object
-        self.main_stack.addWidget(self.scenario)      # add object to main stack
-        self.main_stack.setCurrentIndex(1)            # switch main stack to show created object
+        self.scenario_create = CreateScenario()              # create scenario object
+        self.main_stack.addWidget(self.scenario_create)      # add object to main stack
+        self.main_stack.setCurrentIndex(1)                   # switch main stack to show created object
 
         # assign widgets
-        self.scenario.back_button.clicked.connect(lambda: clear_and_back())                     # back button
-        self.scenario.create_scenario_tab.currentChanged.connect(lambda: on_tab_change())       # create scenario tabbed widget
+        self.scenario_create.back_button.clicked.connect(lambda: clear_and_back())                     # back button
+        self.scenario_create.create_scenario_tab.currentChanged.connect(lambda: on_tab_change())       # create scenario tabbed widget
 
 
         # Handles the tab change in the create scenario page
         # On last tab, change next button to save button
         def on_tab_change():
-            tab = self.scenario.create_scenario_tab
-            next = self.scenario.next_button
+            tab = self.scenario_create.create_scenario_tab
+            next = self.scenario_create.next_button
             if tab.currentWidget().objectName() == 'tab_3':         # last tab
                 next.setText("Save")
                 next.clicked.disconnect()
@@ -46,7 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Change the main stack to the first one and delete the create scenario object
         def clear_and_back():
             self.main_stack.setCurrentIndex(0) 
-            self.scenario.deleteLater()         # delete create scenario object
+            self.scenario_create.deleteLater()         # delete create scenario object
 
 
         # Save entries of the create scenario in the database
@@ -54,8 +71,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             db = Database('scenes.db')              # create Database object
             db.create_db()                          # create tables if they do not exist
 
-            data = self.scenario.get_values()       # get values from text fields
-            data[0] = data[0].lower()               # lower case title to check for uniqueness
+            data = self.scenario_create.get_values()       # get values from text fields
+            data[0] = data[0].lower()                      # lower case title to check for uniqueness
 
             get_title = "SELECT title FROM scenarios WHERE title = ?"
             title = db.query_db(get_title, [data[0]]) 
@@ -68,13 +85,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             # if there are empty fields
             if data[0] == "" or data[1] == "" or empty:
-                QMessageBox.warning(self.scenario, "Warning", "All fields must be filled !", QMessageBox.Ok)
+                QMessageBox.warning(self.scenario_create, "Warning", "All fields must be filled !", QMessageBox.Ok)
             # if question and answer fields are not equal
             elif len(data[4]) != len(data[5]):
-                QMessageBox.warning(self.scenario, "Warning", "All questions must be associated with an answer !", QMessageBox.Ok)
+                QMessageBox.warning(self.scenario_create, "Warning", "All questions must be associated with an answer !", QMessageBox.Ok)
             # if title already exists in the database
             elif title:
-                QMessageBox.warning(self.scenario, "Warning", "Title already exists !", QMessageBox.Ok)
+                QMessageBox.warning(self.scenario_create, "Warning", "Title already exists !", QMessageBox.Ok)
             # constraints done -> save in database
             else:
                 # Insert title / scenario

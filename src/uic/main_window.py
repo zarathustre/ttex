@@ -47,11 +47,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addItem(self.horizontalSpacer, 4, 0, 1, 1)
 
-        self.start_scenario_button = QPushButton(self.home_page)
-        self.start_scenario_button.setObjectName(u"start_scenario_button")
-
-        self.gridLayout.addWidget(self.start_scenario_button, 4, 1, 1, 1)
-
         self.label_2 = QLabel(self.home_page)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setAlignment(Qt.AlignCenter)
@@ -81,6 +76,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addItem(self.verticalSpacer_4, 6, 1, 1, 1)
 
+        self.start_scenario_button = QPushButton(self.home_page)
+        self.start_scenario_button.setObjectName(u"start_scenario_button")
+
+        self.gridLayout.addWidget(self.start_scenario_button, 4, 1, 1, 1)
+
         self.main_stack.addWidget(self.home_page)
 
         self.verticalLayout.addWidget(self.main_stack)
@@ -107,10 +107,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.actionExit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
-        self.start_scenario_button.setText(QCoreApplication.translate("MainWindow", u"Start Scenario", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Start a scenario or create a new one", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Welcome to TTXE", None))
         self.create_scenario_button.setText(QCoreApplication.translate("MainWindow", u"Create Scenario", None))
+        self.start_scenario_button.setText(QCoreApplication.translate("MainWindow", u"Start Scenario", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi
 
