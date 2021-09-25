@@ -37,7 +37,7 @@ class Database(object):
         self.cnx.close()
 
     # Query the database
-    def query_db(self, query, var):
+    def query_db(self, query, var=[]):
         self.connect_db()
         self.cursor.execute(query, var)
 

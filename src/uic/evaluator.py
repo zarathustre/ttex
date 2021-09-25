@@ -21,14 +21,8 @@ class Ui_Evaluator(object):
         self.verticalLayout = QVBoxLayout(Evaluator)
         self.verticalLayout.setSpacing(20)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.scenarios_tree = QTreeWidget(Evaluator)
-        __qtreewidgetitem = QTreeWidgetItem()
-        __qtreewidgetitem.setText(1, u"2");
-        __qtreewidgetitem.setText(0, u"1");
-        self.scenarios_tree.setHeaderItem(__qtreewidgetitem)
+        self.scenarios_tree = QTreeView(Evaluator)
         self.scenarios_tree.setObjectName(u"scenarios_tree")
-        self.scenarios_tree.setSortingEnabled(False)
-        self.scenarios_tree.setColumnCount(2)
 
         self.verticalLayout.addWidget(self.scenarios_tree)
 

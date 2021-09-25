@@ -1,5 +1,6 @@
-from PySide6.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QComboBox
+from PySide6.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QComboBox, QMessageBox
 from src.uic.create_scenario_page import Ui_create_scenario_page
+from src.lite import Database
 
 
 class CreateScenario(QWidget, Ui_create_scenario_page):
@@ -29,6 +30,19 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         self.add_answer_button.clicked.connect(lambda: self.add_answer())
         self.remove_answer_button.clicked.connect(lambda: self.remove_answer())
         self.clear_button.clicked.connect(lambda: self.clear_text())
+
+    # Handles the tab change in the create scenario page - On last tab, change next button to save button
+    def on_tab_change(self, func):
+        tab = self.create_scenario_tab
+        next = self.next_button
+        if tab.currentWidget().objectName() == 'tab_3':         # last tab
+            next.setText("Save")
+            next.clicked.disconnect()
+            next.clicked.connect(lambda: func())       # next button becomes save button to save entries in database
+        else:
+            next.setText("Next")
+            next.clicked.disconnect()
+            next.clicked.connect(lambda: tab.setCurrentIndex(tab.currentIndex() + 1))   # next button changes tab to the next one
 
     # Clear the input fields of the current tab
     def clear_text(self):
@@ -158,3 +172,65 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
             answers.append(answ.toPlainText())
 
         return [title, scenario, objectives, injects, questions, answers, weights]
+
+    # Check for all database saving constraints - Returns True if none are violated
+    def check_constraints(self):
+        db = Database('scenes.db')     # create Database object
+        db.create_db()                 # create tables if they do not exist
+
+        data = self.get_values()       # get values from text fields
+        data[0] = data[0].lower()      # lower case title to check for uniqueness
+
+        get_title = "SELECT title FROM scenarios WHERE title = ?"
+        title = db.query_db(get_title, [data[0]]) 
+
+        empty = False           # this variable is true if any text field is empty
+        for i in range(2,6):
+            for item in data[i]:
+                if item == "":
+                    empty = True        
+
+        # if there are empty fields
+        if data[0] == "" or data[1] == "" or empty:
+            QMessageBox.warning(self, "Warning", "All fields must be filled !", QMessageBox.Ok)
+        # if question and answer fields are not equal
+        elif len(data[4]) != len(data[5]):
+            QMessageBox.warning(self, "Warning", "All questions must be associated with an answer !", QMessageBox.Ok)
+        # if title already exists in the database
+        elif title:
+            QMessageBox.warning(self, "Warning", "Title already exists !", QMessageBox.Ok)
+        # constraints done -> save in database
+        else:
+            return True
+
+        return False
+
+    # Saves the values in the input fields to the database
+    def save_to_db(self):
+        db = Database('scenes.db')     # create Database object
+
+        data = self.get_values()       # get values from text fields
+        data[0] = data[0].lower()      # lower case title to check for uniqueness
+
+        # Insert title / scenario
+        insert_scenario = "INSERT INTO scenarios (title, scenario) VALUES (?, ?)"
+        db.query_db(insert_scenario, [data[0], data[1]])
+
+        # Get scenario id
+        get_id = "SELECT id FROM scenarios WHERE title = ?"
+        id = db.query_db(get_id, [data[0]])[0][0]
+
+        # Insert objectives
+        for i in range(len(data[2])):
+            q = "UPDATE scenarios SET o" + str(i+1) + " = ? WHERE id = ?"
+            db.query_db(q, [data[2][i], id])
+
+        # Insert injects
+        for i in range(len(data[3])):
+            q = "UPDATE scenarios SET i" + str(i+1) + " = ? WHERE id = ?"
+            db.query_db(q, [data[3][i], id])
+
+        # Insert questions / answers / weights
+        for i in range(len(data[4])):
+            q = "INSERT INTO qaw VALUES (?, ?, ?, ?)"
+            db.query_db(q, [id, data[4][i], data[5][i], data[6][i]])
