@@ -52,6 +52,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Save entries of the create scenario in the database
         def save_and_back():
             if self.create_scenario_obj.check_constraints():
-                thread = threading.Thread(target=self.create_scenario_obj.save_to_db())
+                thread = threading.Thread(target=self.create_scenario_obj.save_to_db)
                 thread.start()
                 clear_and_back()

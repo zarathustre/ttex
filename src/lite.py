@@ -21,7 +21,8 @@ class Database(object):
             CREATE TABLE IF NOT EXISTS scenarios 
             (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT UNIQUE, scenario TEXT,
             o1 TEXT, o2 TEXT, o3 TEXT, o4 TEXT, o5 TEXT,
-            i1 TEXT, i2 TEXT, i3 TEXT, i4 TEXT, i5 TEXT)
+            i1 TEXT, i2 TEXT, i3 TEXT, i4 TEXT, i5 TEXT,
+            date DATE)
             """
         )
 

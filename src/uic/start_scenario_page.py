@@ -20,6 +20,7 @@ class Ui_StartScenario(object):
         StartScenario.resize(800, 600)
         self.verticalLayout = QVBoxLayout(StartScenario)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(20, 20, 20, 20)
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.back_button = QPushButton(StartScenario)

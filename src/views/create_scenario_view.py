@@ -213,7 +213,7 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         data[0] = data[0].lower()      # lower case title to check for uniqueness
 
         # Insert title / scenario
-        insert_scenario = "INSERT INTO scenarios (title, scenario) VALUES (?, ?)"
+        insert_scenario = "INSERT INTO scenarios (title, scenario, date) VALUES (?, ?, DATE('now', 'localtime'))"
         db.query_db(insert_scenario, [data[0], data[1]])
 
         # Get scenario id

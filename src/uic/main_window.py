@@ -28,6 +28,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(20, 20, 20, 20)
         self.main_stack = QStackedWidget(self.centralwidget)
         self.main_stack.setObjectName(u"main_stack")
         self.home_page = QWidget()

@@ -19,10 +19,12 @@ class Ui_Evaluator(object):
             Evaluator.setObjectName(u"Evaluator")
         Evaluator.resize(800, 600)
         self.verticalLayout = QVBoxLayout(Evaluator)
-        self.verticalLayout.setSpacing(20)
+        self.verticalLayout.setSpacing(30)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(20, 30, 20, 20)
         self.scenarios_tree = QTreeView(Evaluator)
         self.scenarios_tree.setObjectName(u"scenarios_tree")
+        self.scenarios_tree.setSortingEnabled(True)
 
         self.verticalLayout.addWidget(self.scenarios_tree)
 
@@ -30,6 +32,10 @@ class Ui_Evaluator(object):
         self.horizontalLayout.setSpacing(100)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(50, -1, 50, -1)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
         self.delete_button = QPushButton(Evaluator)
         self.delete_button.setObjectName(u"delete_button")
 
@@ -44,6 +50,10 @@ class Ui_Evaluator(object):
         self.start_button.setObjectName(u"start_button")
 
         self.horizontalLayout.addWidget(self.start_button)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_3)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
