@@ -21,7 +21,7 @@ class Ui_create_scenario_page(object):
         self.verticalLayout = QVBoxLayout(create_scenario_page)
         self.verticalLayout.setSpacing(20)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(15, 20, -1, 20)
+        self.verticalLayout.setContentsMargins(20, 20, 20, 20)
         self.back_button = QPushButton(create_scenario_page)
         self.back_button.setObjectName(u"back_button")
         sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
