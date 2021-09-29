@@ -1,7 +1,9 @@
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+from PySide6.QtWidgets import QMainWindow
 from src.uic.main_window import Ui_MainWindow
 from .create_scenario_view import CreateScenario
 from .start_scenario_view import StartScenario
+from .evaluator_view import Evaluator
+from .evaluator_start_view import EvaluatorStart
 import threading
 
 
@@ -25,13 +27,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # assign widgets
         self.start_scenario_obj.back_button.clicked.connect(lambda: clear_and_back())
+        self.start_scenario_obj.evaluator_button.clicked.connect(lambda: create_evaluator())
+        self.start_scenario_obj.start_stack.currentChanged.connect(lambda: self.start_scenario_obj.on_tab_change(clear_and_back))
 
-        # TODO fix the back button functionality to be more dynamic by changing to the previous page instead of home page
 
         def clear_and_back():
             self.main_stack.setCurrentIndex(0)
             self.start_scenario_obj.deleteLater()
 
+
+        def create_evaluator():
+            evaluator_obj = Evaluator()
+            self.start_scenario_obj.start_stack.addWidget(evaluator_obj)  
+            self.start_scenario_obj.start_stack.setCurrentIndex(1)
+            evaluator_obj.create_from_start_button.clicked.connect(lambda: create_from_start())
+            evaluator_obj.start_button.clicked.connect(lambda: evaluator_start())
+
+
+            def create_from_start():
+                self.create_scenario()
+                evaluator_obj.deleteLater()
+                self.start_scenario_obj.deleteLater()
+
+        
+            def evaluator_start():
+                evaluator_start_obj = EvaluatorStart()
+                self.main_stack.addWidget(evaluator_start_obj)
+                self.main_stack.setCurrentIndex(2)
+
+                evaluator_start_obj.terminate_button.clicked.connect(lambda: clear_all_back())
+
+                values = evaluator_obj.get_from_db()
+                if values:
+                    evaluator_start_obj.assign_fields(values)
+
+                def clear_all_back():
+                    self.main_stack.setCurrentIndex(0)
+                    evaluator_start_obj.deleteLater()
+                    evaluator_obj.deleteLater()
+                    self.start_scenario_obj.deleteLater()
+   
 
     # Handles the creation of a new scenario
     def create_scenario(self):
@@ -41,13 +76,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # assign widgets
         self.create_scenario_obj.back_button.clicked.connect(lambda: clear_and_back())     # back button
+
         self.create_scenario_obj.create_scenario_tab.currentChanged.connect(\
             lambda: self.create_scenario_obj.on_tab_change(save_and_back))                 # tabbed widget
-
-        # Change the main stack to the first one and delete the create scenario object
-        def clear_and_back():
-            self.main_stack.setCurrentIndex(0) 
-            self.create_scenario_obj.deleteLater()         # delete create scenario object
 
         # Save entries of the create scenario in the database
         def save_and_back():
@@ -55,3 +86,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 thread = threading.Thread(target=self.create_scenario_obj.save_to_db)
                 thread.start()
                 clear_and_back()
+
+        # Change the main stack to the first one and delete the create scenario object
+        def clear_and_back():
+            self.main_stack.setCurrentIndex(0) 
+            self.create_scenario_obj.deleteLater()         # delete create scenario object

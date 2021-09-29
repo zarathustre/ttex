@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import QWidget
 from src.uic.start_scenario_page import Ui_StartScenario
-from .evaluator_view import Evaluator
 
 
 class StartScenario(QWidget, Ui_StartScenario):
@@ -16,10 +15,16 @@ class StartScenario(QWidget, Ui_StartScenario):
 
 
     def assign_widgets(self):
-        self.evaluator_button.clicked.connect(lambda: self.create_evaluator())
+        pass
 
 
-    def create_evaluator(self):
-        self.evaluator = Evaluator()
-        self.start_stack.addWidget(self.evaluator)
-        self.start_stack.setCurrentIndex(1)    
+    # Handles the stack change in the start scenario page
+    def on_tab_change(self, clear_and_back):
+        stack = self.start_stack
+        back = self.back_button
+        if stack.currentIndex() == 0:        
+            back.clicked.disconnect()
+            back.clicked.connect(lambda: clear_and_back())    
+        else:
+            back.clicked.disconnect()
+            back.clicked.connect(lambda: stack.setCurrentIndex(stack.currentIndex() - 1))

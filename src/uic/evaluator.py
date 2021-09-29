@@ -22,6 +22,20 @@ class Ui_Evaluator(object):
         self.verticalLayout.setSpacing(30)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(20, 30, 20, 20)
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
+
+        self.create_from_start_button = QToolButton(Evaluator)
+        self.create_from_start_button.setObjectName(u"create_from_start_button")
+
+        self.horizontalLayout_2.addWidget(self.create_from_start_button)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+
         self.scenarios_tree = QTreeView(Evaluator)
         self.scenarios_tree.setObjectName(u"scenarios_tree")
         self.scenarios_tree.setSortingEnabled(True)
@@ -66,6 +80,7 @@ class Ui_Evaluator(object):
 
     def retranslateUi(self, Evaluator):
         Evaluator.setWindowTitle(QCoreApplication.translate("Evaluator", u"Form", None))
+        self.create_from_start_button.setText(QCoreApplication.translate("Evaluator", u"+", None))
         self.delete_button.setText(QCoreApplication.translate("Evaluator", u"Delete", None))
         self.export_button.setText(QCoreApplication.translate("Evaluator", u"Export", None))
         self.start_button.setText(QCoreApplication.translate("Evaluator", u"Start", None))

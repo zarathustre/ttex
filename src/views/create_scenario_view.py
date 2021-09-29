@@ -10,15 +10,14 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         self.init_widgets()
         self.assign_widgets()
 
-
+    # Initialize widgets
     def init_widgets(self):
         self.create_scenario_tab.setCurrentIndex(0)
         self.question_combo_box.setFixedWidth(50)
-        # Add integers 1 to 10 to the weight combobox
         for i in range(10):
-            self.question_combo_box.addItem(str(i+1))
+            self.question_combo_box.addItem(str(i+1))   # Add integers 1 to 10 to the weight combobox
 
-
+    # Assign widgets (some are assigned in the main window view)
     def assign_widgets(self):
         self.next_button.clicked.connect(lambda: self.create_scenario_tab.setCurrentIndex(self.create_scenario_tab.currentIndex() + 1))
         self.add_objective_button.clicked.connect(lambda: self.add_objective())
@@ -32,13 +31,13 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         self.clear_button.clicked.connect(lambda: self.clear_text())
 
     # Handles the tab change in the create scenario page - On last tab, change next button to save button
-    def on_tab_change(self, func):
+    def on_tab_change(self, save_and_back):
         tab = self.create_scenario_tab
         next = self.next_button
         if tab.currentWidget().objectName() == 'tab_3':         # last tab
             next.setText("Save")
             next.clicked.disconnect()
-            next.clicked.connect(lambda: func())       # next button becomes save button to save entries in database
+            next.clicked.connect(lambda: save_and_back())       # next button becomes save button to save entries in database
         else:
             next.setText("Next")
             next.clicked.disconnect()
