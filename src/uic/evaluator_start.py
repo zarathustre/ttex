@@ -24,15 +24,20 @@ class Ui_EvaluatorStart(object):
         self.verticalLayout.setContentsMargins(20, 20, 20, 0)
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.time_counter = QLCDNumber(EvaluatorStart)
+        self.time_counter.setObjectName(u"time_counter")
+
+        self.horizontalLayout.addWidget(self.time_counter)
+
         self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_4)
 
-        self.lobby_count = QLCDNumber(EvaluatorStart)
-        self.lobby_count.setObjectName(u"lobby_count")
-        self.lobby_count.setFrameShape(QFrame.Box)
+        self.lobby_counter = QLCDNumber(EvaluatorStart)
+        self.lobby_counter.setObjectName(u"lobby_counter")
+        self.lobby_counter.setFrameShape(QFrame.Box)
 
-        self.horizontalLayout.addWidget(self.lobby_count)
+        self.horizontalLayout.addWidget(self.lobby_counter)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -102,13 +107,34 @@ class Ui_EvaluatorStart(object):
         self.evaluator_start_tab.addTab(self.tab_1, "")
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
+        self.verticalLayout_4 = QVBoxLayout(self.tab_2)
+        self.verticalLayout_4.setSpacing(15)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.injects_group = QGroupBox(self.tab_2)
+        self.injects_group.setObjectName(u"injects_group")
+        self.verticalLayout_5 = QVBoxLayout(self.injects_group)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+
+        self.verticalLayout_4.addWidget(self.injects_group)
+
+        self.questions_group = QGroupBox(self.tab_2)
+        self.questions_group.setObjectName(u"questions_group")
+        self.verticalLayout_6 = QVBoxLayout(self.questions_group)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+
+        self.verticalLayout_4.addWidget(self.questions_group)
+
         self.evaluator_start_tab.addTab(self.tab_2, "")
+        self.tab_3 = QWidget()
+        self.tab_3.setObjectName(u"tab_3")
+        self.evaluator_start_tab.addTab(self.tab_3, "")
 
         self.verticalLayout.addWidget(self.evaluator_start_tab)
 
         self.time_bar = QProgressBar(EvaluatorStart)
         self.time_bar.setObjectName(u"time_bar")
-        self.time_bar.setValue(100)
+        self.time_bar.setMaximum(0)
+        self.time_bar.setValue(0)
         self.time_bar.setInvertedAppearance(False)
 
         self.verticalLayout.addWidget(self.time_bar)
@@ -116,7 +142,7 @@ class Ui_EvaluatorStart(object):
 
         self.retranslateUi(EvaluatorStart)
 
-        self.evaluator_start_tab.setCurrentIndex(0)
+        self.evaluator_start_tab.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(EvaluatorStart)
@@ -129,6 +155,10 @@ class Ui_EvaluatorStart(object):
         self.start_timer_button.setText(QCoreApplication.translate("EvaluatorStart", u"Start Timer", None))
         self.terminate_button.setText(QCoreApplication.translate("EvaluatorStart", u"Terminate", None))
         self.evaluator_start_tab.setTabText(self.evaluator_start_tab.indexOf(self.tab_1), QCoreApplication.translate("EvaluatorStart", u"Tab 1", None))
+        self.injects_group.setTitle(QCoreApplication.translate("EvaluatorStart", u"Injects", None))
+        self.questions_group.setTitle(QCoreApplication.translate("EvaluatorStart", u"Questions", None))
         self.evaluator_start_tab.setTabText(self.evaluator_start_tab.indexOf(self.tab_2), QCoreApplication.translate("EvaluatorStart", u"Tab 2", None))
+        self.evaluator_start_tab.setTabText(self.evaluator_start_tab.indexOf(self.tab_3), QCoreApplication.translate("EvaluatorStart", u"Tab 3", None))
+        self.time_bar.setFormat(QCoreApplication.translate("EvaluatorStart", u"%p%", None))
     # retranslateUi
 

@@ -61,7 +61,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if values:
                     evaluator_start_obj.assign_fields(values)
 
+
                 def clear_all_back():
+                    evaluator_start_obj.running = False
+                    evaluator_start_obj.paused = False
                     self.main_stack.setCurrentIndex(0)
                     evaluator_start_obj.deleteLater()
                     evaluator_obj.deleteLater()

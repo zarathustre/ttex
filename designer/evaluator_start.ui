@@ -32,6 +32,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QLCDNumber" name="time_counter"/>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -45,7 +48,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLCDNumber" name="lobby_count">
+      <widget class="QLCDNumber" name="lobby_counter">
        <property name="frameShape">
         <enum>QFrame::Box</enum>
        </property>
@@ -56,7 +59,7 @@
    <item>
     <widget class="QTabWidget" name="evaluator_start_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
@@ -158,16 +161,48 @@
       <attribute name="title">
        <string>Tab 2</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>15</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="injects_group">
+         <property name="title">
+          <string>Injects</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5"/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="questions_group">
+         <property name="title">
+          <string>Questions</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Tab 3</string>
+      </attribute>
      </widget>
     </widget>
    </item>
    <item>
     <widget class="QProgressBar" name="time_bar">
+     <property name="maximum">
+      <number>0</number>
+     </property>
      <property name="value">
-      <number>100</number>
+      <number>0</number>
      </property>
      <property name="invertedAppearance">
       <bool>false</bool>
+     </property>
+     <property name="format">
+      <string>%p%</string>
      </property>
     </widget>
    </item>
