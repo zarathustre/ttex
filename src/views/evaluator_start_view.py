@@ -14,8 +14,8 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
     
     def init_widgets(self):
         self.evaluator_start_tab.setCurrentIndex(0)
-        self.running = True
-        self.paused = False
+        self.timer_running = True
+        self.timer_paused = False
     
     
     def assign_widgets(self):
@@ -31,16 +31,16 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.start_timer_button.setText('Pause')
         self.time_bar.setMaximum(time_limit)
         self.time_bar.setValue(time_limit)
-        self.thread = threading.Thread(target=self.start_timer, args=(time_limit, ))
-        self.thread.start()
+        thread = threading.Thread(target=self.start_timer, args=(time_limit, ), daemon=True)
+        thread.start()
 
 
     def pause_timer(self):
         if self.start_timer_button.text() == 'Pause':
-            self.paused = True
+            self.timer_paused = True
             self.start_timer_button.setText('Resume')
         elif self.start_timer_button.text() == 'Resume':
-            self.paused = False
+            self.timer_paused = False
             self.start_timer_button.setText('Pause')
         
 
@@ -52,14 +52,13 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.time_counter.display((time_limit // 60) + 1)      
             time.sleep(1)
 
-            if self.paused:
-                while self.paused:
+            if self.timer_paused:
+                while self.timer_paused:
                     time.sleep(1)
 
-            if not self.running:
+            if not self.timer_running:
                 break
 
-        self.time_counter.display(0)
         print('Done')
             
 

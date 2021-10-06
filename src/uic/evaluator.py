@@ -46,14 +46,15 @@ class Ui_Evaluator(object):
         self.horizontalLayout.setSpacing(100)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(50, -1, 50, -1)
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer)
-
         self.delete_button = QPushButton(Evaluator)
         self.delete_button.setObjectName(u"delete_button")
 
         self.horizontalLayout.addWidget(self.delete_button)
+
+        self.import_button = QPushButton(Evaluator)
+        self.import_button.setObjectName(u"import_button")
+
+        self.horizontalLayout.addWidget(self.import_button)
 
         self.export_button = QPushButton(Evaluator)
         self.export_button.setObjectName(u"export_button")
@@ -64,10 +65,6 @@ class Ui_Evaluator(object):
         self.start_button.setObjectName(u"start_button")
 
         self.horizontalLayout.addWidget(self.start_button)
-
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_3)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -82,6 +79,7 @@ class Ui_Evaluator(object):
         Evaluator.setWindowTitle(QCoreApplication.translate("Evaluator", u"Form", None))
         self.create_from_start_button.setText(QCoreApplication.translate("Evaluator", u"+", None))
         self.delete_button.setText(QCoreApplication.translate("Evaluator", u"Delete", None))
+        self.import_button.setText(QCoreApplication.translate("Evaluator", u"Import", None))
         self.export_button.setText(QCoreApplication.translate("Evaluator", u"Export", None))
         self.start_button.setText(QCoreApplication.translate("Evaluator", u"Start", None))
     # retranslateUi

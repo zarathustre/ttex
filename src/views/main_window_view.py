@@ -4,6 +4,7 @@ from .create_scenario_view import CreateScenario
 from .start_scenario_view import StartScenario
 from .evaluator_view import Evaluator
 from .evaluator_start_view import EvaluatorStart
+from src.network.server import Server
 import threading
 
 
@@ -61,10 +62,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if values:
                     evaluator_start_obj.assign_fields(values)
 
-
+                server = Server()
+                network_thread = threading.Thread(target=server.start, daemon=True)
+                network_thread.start()
+        
                 def clear_all_back():
-                    evaluator_start_obj.running = False
-                    evaluator_start_obj.paused = False
+                    server.server_running = False
+                    evaluator_start_obj.timer_running = False
+                    evaluator_start_obj.timer_paused = False
                     self.main_stack.setCurrentIndex(0)
                     evaluator_start_obj.deleteLater()
                     evaluator_obj.deleteLater()

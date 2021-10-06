@@ -13,6 +13,9 @@ class Server():
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind(self.ADDR)
 
+        self.server_running = True
+        self.server.settimeout(1.0)
+
     
     def handle_client(self, conn, addr):
         
@@ -37,8 +40,15 @@ class Server():
         print("[STARTING] server is starting...")
         self.server.listen()
         print(f"[LISTENING] Server is listening on {self.SERVER}")
+
         while True:
-            conn, addr = self.server.accept()
-            thread = threading.Thread(target=self.handle_client, args=(conn, addr))
-            thread.start()
-            print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+            try:
+                if not self.server_running: 
+                    print('Server stopped')
+                    break
+                conn, addr = self.server.accept()
+                thread = threading.Thread(target=self.handle_client, args=(conn, addr))
+                thread.start()
+                print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+            except socket.timeout as e:
+                pass
