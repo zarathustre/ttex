@@ -1,54 +1,35 @@
 import socket 
-import threading
 
+HOST = '127.0.0.1'
+PORT = 55555
 
 class Server():
-    def __init__(self):
-        self.HEADER = 64
-        self.DISCONNECT_MESSAGE = "!DISCONNECT"
-        self.PORT = 5050
-        self.SERVER = socket.gethostbyname(socket.gethostname())
-        self.ADDR = (self.SERVER, self.PORT)
-
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind(self.ADDR)
-
+    def __init__(self):  
         self.server_running = True
-        self.server.settimeout(1.0)
+        self.clients = []
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.bind((HOST, PORT))
+        self.server_socket.settimeout(0.1)
+        print('Server listening...')
+        self.server_socket.listen()
 
-    
-    def handle_client(self, conn, addr):
-        
-        print(f"[NEW CONNECTION] {addr} connected.")
+    def send_to_all(self, message):
+        for client in self.clients:
+            client.sendall(message.encode())
 
-        connected = True
-        while connected:
-            msg_length = conn.recv(self.HEADER).decode('utf-8')
-            if msg_length:
-                msg_length = int(msg_length)
-                msg = conn.recv(msg_length).decode('utf-8')
-                if msg == self.DISCONNECT_MESSAGE:
-                    connected = False
-
-                print(f"[{addr}] {msg}")
-                conn.send("Msg received".encode('utf-8'))   # send to client
-
-        conn.close()
-
-
-    def start(self):
-        print("[STARTING] server is starting...")
-        self.server.listen()
-        print(f"[LISTENING] Server is listening on {self.SERVER}")
-
-        while True:
+    def accept_clients(self):
+        while self.server_running:
             try:
-                if not self.server_running: 
-                    print('Server stopped')
-                    break
-                conn, addr = self.server.accept()
-                thread = threading.Thread(target=self.handle_client, args=(conn, addr))
-                thread.start()
-                print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
-            except socket.timeout as e:
+                client, address = self.server_socket.accept()
+                if client:
+                    print(f'Connection from {str(address)}')
+                    self.clients.append(client)
+            except socket.timeout:
                 pass
+                
+        print('Server shutting down')
+
+    def shutdown_server(self):
+        self.send_to_all('!DISCONNECT')
+        self.server_running = False
+        self.server_socket.close()

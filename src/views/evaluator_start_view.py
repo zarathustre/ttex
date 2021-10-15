@@ -91,6 +91,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.line2.setFrameShadow(QFrame.Sunken)
         self.verticalLayout_5.addWidget(self.line2)        
 
+        i = 0
         for inject in dict['injects']:
             self.horizontalLayout = QHBoxLayout()
             self.inject_label = QLabel(self.injects_group)
@@ -102,6 +103,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.inject_label.setText(inject)
             self.inject_label.setWordWrap(True)
             self.send_inject_button = QToolButton(self.injects_group)
+            self.send_inject_button.setObjectName(f'send_inject_button_{i}')
             self.send_inject_button.setText('Send')
             self.horizontalLayout.addWidget(self.inject_label)
             self.horizontalLayout.addWidget(self.send_inject_button)
@@ -110,6 +112,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.line.setFrameShape(QFrame.HLine)
             self.line.setFrameShadow(QFrame.Sunken)
             self.verticalLayout_5.addWidget(self.line) 
+            i += 1
 
         # questions
         self.line3 = QFrame(self.questions_group)
@@ -136,4 +139,4 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.line.setFrameShape(QFrame.HLine)
             self.line.setFrameShadow(QFrame.Sunken)
             self.verticalLayout_6.addWidget(self.line) 
-                
+        

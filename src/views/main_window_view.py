@@ -1,11 +1,14 @@
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QToolButton
 from src.uic.main_window import Ui_MainWindow
 from .create_scenario_view import CreateScenario
 from .start_scenario_view import StartScenario
 from .evaluator_view import Evaluator
 from .evaluator_start_view import EvaluatorStart
-from src.network.server import Server
+from .player_view import Player
 import threading
+import socket
+from functools import partial
+from src.network.server import Server
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -30,6 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.start_scenario_obj.back_button.clicked.connect(lambda: clear_and_back())
         self.start_scenario_obj.evaluator_button.clicked.connect(lambda: create_evaluator())
         self.start_scenario_obj.start_stack.currentChanged.connect(lambda: self.start_scenario_obj.on_tab_change(clear_and_back))
+        self.start_scenario_obj.player_button.clicked.connect(lambda: create_player())
 
 
         def clear_and_back():
@@ -43,7 +47,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.start_scenario_obj.start_stack.setCurrentIndex(1)
             evaluator_obj.create_from_start_button.clicked.connect(lambda: create_from_start())
             evaluator_obj.start_button.clicked.connect(lambda: evaluator_start())
-
+            
 
             def create_from_start():
                 self.create_scenario()
@@ -61,20 +65,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 values = evaluator_obj.get_from_db()
                 if values:
                     evaluator_start_obj.assign_fields(values)
-
+                
                 server = Server()
-                network_thread = threading.Thread(target=server.start, daemon=True)
-                network_thread.start()
-        
+                server_thread = threading.Thread(target=server.accept_clients, daemon=True)
+                server_thread.start()
+                injects = values['injects']
+                send_inject_buttons = evaluator_start_obj.injects_group.findChildren(QToolButton)
+                for button in send_inject_buttons:
+                    i = int(button.objectName()[-1])
+                    button.clicked.connect(partial(server.send_to_all, injects[i]))
+
                 def clear_all_back():
-                    server.server_running = False
+                    server.shutdown_server()
                     evaluator_start_obj.timer_running = False
                     evaluator_start_obj.timer_paused = False
                     self.main_stack.setCurrentIndex(0)
                     evaluator_start_obj.deleteLater()
                     evaluator_obj.deleteLater()
                     self.start_scenario_obj.deleteLater()
-   
+
+
+        def create_player():
+            player = Player()
+            self.main_stack.addWidget(player)
+            self.main_stack.setCurrentIndex(2)
+
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect(('127.0.0.1', 55555))
+
+            def receive():
+                while True:
+                    try:
+                        msg = client_socket.recv(1024).decode()
+                        if msg == '!DISCONNECT':
+                            print('Server disconnected')
+                            break
+                        player.temp_label.setText(msg)
+                    except socket.error as e:
+                        print(f'Client error: {e}. Shutting down')
+                        client_socket.close()
+                        break
+
+            client_thread = threading.Thread(target=receive, daemon=True)
+            client_thread.start()
+
 
     # Handles the creation of a new scenario
     def create_scenario(self):
