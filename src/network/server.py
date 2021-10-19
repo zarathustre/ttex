@@ -28,8 +28,9 @@ class Server():
                 pass
                 
         print('Server shutting down')
+        self.server_socket.close()
 
     def shutdown_server(self):
-        self.send_to_all('!DISCONNECT')
+        if len(self.clients) != 0:
+            self.send_to_all('!DISCONNECT')
         self.server_running = False
-        self.server_socket.close()

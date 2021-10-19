@@ -73,7 +73,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 send_inject_buttons = evaluator_start_obj.injects_group.findChildren(QToolButton)
                 for button in send_inject_buttons:
                     i = int(button.objectName()[-1])
-                    button.clicked.connect(partial(server.send_to_all, injects[i]))
+                    button.clicked.connect(partial(server.send_to_all, injects[i])) # f'!INJECT{i}:{injects[i]}'
 
                 def clear_all_back():
                     server.shutdown_server()
@@ -100,7 +100,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         if msg == '!DISCONNECT':
                             print('Server disconnected')
                             break
+                        #if msg.startswith('!INJECT'):
+                            #player.player_scenario_text.setText(f'{msg[7]}: {msg[8:]}')
                         player.temp_label.setText(msg)
+                        """ This only works with labels. Textboxes raise a threading exception (See signals and slots) """
                     except socket.error as e:
                         print(f'Client error: {e}. Shutting down')
                         client_socket.close()
