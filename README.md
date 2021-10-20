@@ -6,7 +6,7 @@ The user interface is made with the QT library's python bindings (PySide6).
 
 To have the project on your machine, follow these steps:
 
-1- clone the repository: 'git clone https://github.com/zarathustre/ttex.git'\n
+1- clone the repository: 'git clone https://github.com/zarathustre/ttex.git'
 2- go into the new cloned repository: 'cd ttex'
 3- create a virtual environment: 'virtualenv .venv'
 4- activate the virtual environment: 'source .venv/bin/activate'
