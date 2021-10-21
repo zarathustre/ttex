@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="player_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
@@ -32,15 +32,7 @@
          <property name="title">
           <string>Injects</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <widget class="QLabel" name="temp_label">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QVBoxLayout" name="verticalLayout_4"/>
         </widget>
        </item>
       </layout>
@@ -55,7 +47,11 @@
          <property name="title">
           <string>Questions</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_5"/>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="spacing">
+           <number>20</number>
+          </property>
+         </layout>
         </widget>
        </item>
       </layout>

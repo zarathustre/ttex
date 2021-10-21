@@ -69,11 +69,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 server = Server()
                 server_thread = threading.Thread(target=server.accept_clients, daemon=True)
                 server_thread.start()
+
                 injects = values['injects']
                 send_inject_buttons = evaluator_start_obj.injects_group.findChildren(QToolButton)
                 for button in send_inject_buttons:
                     i = int(button.objectName()[-1])
-                    button.clicked.connect(partial(server.send_to_all, injects[i])) # f'!INJECT{i}:{injects[i]}'
+                    button.clicked.connect(partial(server.send_to_all, f'!INJECT{injects[i]}'))
+
+                questions = [q[0] for q in values['qaw']]
+                send_question_buttons = evaluator_start_obj.questions_group.findChildren(QToolButton)
+                for button in send_question_buttons:
+                    i = int(button.objectName()[-1])
+                    button.clicked.connect(partial(server.send_to_all, f'!QUESTION{questions[i]}'))
 
                 def clear_all_back():
                     server.shutdown_server()
@@ -89,6 +96,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             player = Player()
             self.main_stack.addWidget(player)
             self.main_stack.setCurrentIndex(2)
+            player.player_tab.setCurrentIndex(0)
 
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect(('127.0.0.1', 55555))
@@ -97,13 +105,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 while True:
                     try:
                         msg = client_socket.recv(1024).decode()
+
                         if msg == '!DISCONNECT':
                             print('Server disconnected')
                             break
-                        #if msg.startswith('!INJECT'):
-                            #player.player_scenario_text.setText(f'{msg[7]}: {msg[8:]}')
-                        player.temp_label.setText(msg)
-                        """ This only works with labels. Textboxes raise a threading exception (See signals and slots) """
+
+                        if msg.startswith('!INJECT'):
+                            player.signals.inject_signal.emit(f'{msg[7:]}')
+
+                        if msg.startswith('!QUESTION'):
+                            player.signals.question_signal.emit(f'{msg[9:]}')
+
                     except socket.error as e:
                         print(f'Client error: {e}. Shutting down')
                         client_socket.close()

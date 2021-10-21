@@ -35,11 +35,6 @@ class Ui_Player(object):
         self.player_injects_group.setObjectName(u"player_injects_group")
         self.verticalLayout_4 = QVBoxLayout(self.player_injects_group)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.temp_label = QLabel(self.player_injects_group)
-        self.temp_label.setObjectName(u"temp_label")
-
-        self.verticalLayout_4.addWidget(self.temp_label)
-
 
         self.verticalLayout_2.addWidget(self.player_injects_group)
 
@@ -51,6 +46,7 @@ class Ui_Player(object):
         self.player_questions_group = QGroupBox(self.tab_2)
         self.player_questions_group.setObjectName(u"player_questions_group")
         self.verticalLayout_5 = QVBoxLayout(self.player_questions_group)
+        self.verticalLayout_5.setSpacing(20)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
 
         self.verticalLayout_3.addWidget(self.player_questions_group)
@@ -62,7 +58,7 @@ class Ui_Player(object):
 
         self.retranslateUi(Player)
 
-        self.player_tab.setCurrentIndex(0)
+        self.player_tab.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(Player)
@@ -71,7 +67,6 @@ class Ui_Player(object):
     def retranslateUi(self, Player):
         Player.setWindowTitle(QCoreApplication.translate("Player", u"Form", None))
         self.player_injects_group.setTitle(QCoreApplication.translate("Player", u"Injects", None))
-        self.temp_label.setText(QCoreApplication.translate("Player", u"TextLabel", None))
         self.player_tab.setTabText(self.player_tab.indexOf(self.tab_1), QCoreApplication.translate("Player", u"Tab 1", None))
         self.player_questions_group.setTitle(QCoreApplication.translate("Player", u"Questions", None))
         self.player_tab.setTabText(self.player_tab.indexOf(self.tab_2), QCoreApplication.translate("Player", u"Tab 2", None))

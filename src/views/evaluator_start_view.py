@@ -120,6 +120,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.line3.setFrameShadow(QFrame.Sunken)
         self.verticalLayout_6.addWidget(self.line3)
 
+        i = 0
         for qaw in dict['qaw']:
             self.horizontalLayout = QHBoxLayout()
             self.question_label = QLabel(self.questions_group)
@@ -131,6 +132,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.question_label.setText(qaw[0])
             self.question_label.setWordWrap(True)
             self.send_question_button = QToolButton(self.questions_group)
+            self.send_question_button.setObjectName(f'send_question_button_{i}')
             self.send_question_button.setText('Send')
             self.horizontalLayout.addWidget(self.question_label)
             self.horizontalLayout.addWidget(self.send_question_button)
@@ -139,4 +141,5 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.line.setFrameShape(QFrame.HLine)
             self.line.setFrameShadow(QFrame.Sunken)
             self.verticalLayout_6.addWidget(self.line) 
+            i += 1
         
