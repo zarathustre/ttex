@@ -6,9 +6,9 @@ from .evaluator_view import Evaluator
 from .evaluator_start_view import EvaluatorStart
 from .player_view import Player
 import threading
-import socket
 from functools import partial
 from src.network.server import Server
+from src.network.client import Client
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -67,8 +67,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     evaluator_start_obj.assign_fields(values)
                 
                 server = Server()
-                server_thread = threading.Thread(target=server.accept_clients, daemon=True)
+                server_thread = threading.Thread(target=server.accept_clients,\
+                    args=(f"!SCENARIO{values['scenario']}", ), daemon=True)
                 server_thread.start()
+
+                server.server_signal.server_signal.connect(evaluator_start_obj.set_lobby_counter)
+                evaluator_start_obj.time_signal.time_signal.connect(server.send_time)
 
                 injects = values['injects']
                 send_inject_buttons = evaluator_start_obj.injects_group.findChildren(QToolButton)
@@ -92,37 +96,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.start_scenario_obj.deleteLater()
 
 
+        # TODO: reset time edit when the timer is started
+        # TODO: send back the answers for every question
+        # TODO: adjust number of logged in clients when a client disconnects
         def create_player():
             player = Player()
             self.main_stack.addWidget(player)
             self.main_stack.setCurrentIndex(2)
             player.player_tab.setCurrentIndex(0)
+            player.player_terminate_button.clicked.connect(lambda: terminate_player())
 
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect(('127.0.0.1', 55555))
-
-            def receive():
-                while True:
-                    try:
-                        msg = client_socket.recv(1024).decode()
-
-                        if msg == '!DISCONNECT':
-                            print('Server disconnected')
-                            break
-
-                        if msg.startswith('!INJECT'):
-                            player.signals.inject_signal.emit(f'{msg[7:]}')
-
-                        if msg.startswith('!QUESTION'):
-                            player.signals.question_signal.emit(f'{msg[9:]}')
-
-                    except socket.error as e:
-                        print(f'Client error: {e}. Shutting down')
-                        client_socket.close()
-                        break
-
-            client_thread = threading.Thread(target=receive, daemon=True)
+            client = Client()
+            client_thread = threading.Thread(target=client.receive,\
+                args=(player.signals.inject_signal, player.signals.question_signal, player.signals.scenario_signal,\
+                    player.player_time_counter, ), daemon=True)
             client_thread.start()
+
+            def terminate_player():
+                client.shutdown_client()
+                self.main_stack.setCurrentIndex(0)
+                player.deleteLater()
+                self.start_scenario_obj.deleteLater()
 
 
     # Handles the creation of a new scenario

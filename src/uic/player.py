@@ -19,7 +19,27 @@ class Ui_Player(object):
             Player.setObjectName(u"Player")
         Player.resize(800, 600)
         self.verticalLayout = QVBoxLayout(Player)
+        self.verticalLayout.setSpacing(20)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.player_terminate_button = QPushButton(Player)
+        self.player_terminate_button.setObjectName(u"player_terminate_button")
+
+        self.horizontalLayout.addWidget(self.player_terminate_button)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+        self.player_time_counter = QLCDNumber(Player)
+        self.player_time_counter.setObjectName(u"player_time_counter")
+
+        self.horizontalLayout.addWidget(self.player_time_counter)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
         self.player_tab = QTabWidget(Player)
         self.player_tab.setObjectName(u"player_tab")
         self.tab_1 = QWidget()
@@ -58,7 +78,7 @@ class Ui_Player(object):
 
         self.retranslateUi(Player)
 
-        self.player_tab.setCurrentIndex(1)
+        self.player_tab.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(Player)
@@ -66,6 +86,7 @@ class Ui_Player(object):
 
     def retranslateUi(self, Player):
         Player.setWindowTitle(QCoreApplication.translate("Player", u"Form", None))
+        self.player_terminate_button.setText(QCoreApplication.translate("Player", u"Terminate", None))
         self.player_injects_group.setTitle(QCoreApplication.translate("Player", u"Injects", None))
         self.player_tab.setTabText(self.player_tab.indexOf(self.tab_1), QCoreApplication.translate("Player", u"Tab 1", None))
         self.player_questions_group.setTitle(QCoreApplication.translate("Player", u"Questions", None))

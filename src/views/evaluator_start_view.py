@@ -1,7 +1,12 @@
 from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton
+from PySide6.QtCore import QObject, Signal, Slot
 from src.uic.evaluator_start import Ui_EvaluatorStart
 import time
 import threading
+
+
+class EvaluatorSignals(QObject):
+    time_signal = Signal(str)
 
 
 class EvaluatorStart(QWidget, Ui_EvaluatorStart):
@@ -10,9 +15,10 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.setupUi(self)
         self.init_widgets()
         self.assign_widgets()
+
         
-    
     def init_widgets(self):
+        self.time_signal = EvaluatorSignals()
         self.evaluator_start_tab.setCurrentIndex(0)
         self.timer_running = True
         self.timer_paused = False
@@ -21,7 +27,12 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
     def assign_widgets(self):
         self.start_timer_button.clicked.connect(lambda: self.start_timer_thread())
 
+        
+    @Slot(int)
+    def set_lobby_counter(self, logged_in):
+        self.lobby_counter.display(logged_in)
 
+        
     def start_timer_thread(self):
         timer = self.time_edit.time()
         time_limit = timer.hour() * 3600 + timer.minute() * 60
@@ -33,6 +44,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.time_bar.setValue(time_limit)
         thread = threading.Thread(target=self.start_timer, args=(time_limit, ), daemon=True)
         thread.start()
+        #self.time_edit.clear()
 
 
     def pause_timer(self):
@@ -44,20 +56,27 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.start_timer_button.setText('Pause')
         
 
-    def start_timer(self, time_limit):  
-        while time_limit > 0:
+    def start_timer(self, time_limit): 
+        self.time_signal.time_signal.emit(str(time_limit))
+        while time_limit >= 0:
             
-            time_limit -= 1
-            self.time_bar.setValue(time_limit)              
-            self.time_counter.display((time_limit // 60) + 1)      
-            time.sleep(1)
+            if not self.timer_running:
+                break
 
             if self.timer_paused:
                 while self.timer_paused:
                     time.sleep(1)
 
-            if not self.timer_running:
+            if time_limit == 0:
+                self.time_counter.display(0)
+                self.time_signal.time_signal.emit('0')
                 break
+
+            time_limit -= 1
+            self.time_bar.setValue(time_limit)              
+            self.time_counter.display((time_limit // 60) + 1)      
+            self.time_signal.time_signal.emit(str(time_limit))
+            time.sleep(1)
 
         print('Done')
             

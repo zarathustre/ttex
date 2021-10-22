@@ -3,9 +3,10 @@ from src.uic.player import Ui_Player
 from PySide6.QtCore import Slot, Signal, QObject
 
 
-class Signals(QObject):
+class PlayerSignals(QObject):
     inject_signal = Signal(str)
     question_signal = Signal(str)
+    scenario_signal = Signal(str)
 
 
 class Player(QWidget, Ui_Player):
@@ -16,9 +17,10 @@ class Player(QWidget, Ui_Player):
 
 
     def init_signals(self):
-        self.signals = Signals()
+        self.signals = PlayerSignals()
         self.signals.inject_signal.connect(self.set_inject)
         self.signals.question_signal.connect(self.set_question)
+        self.signals.scenario_signal.connect(self.set_scenario)
 
 
     @Slot(str)
@@ -46,3 +48,8 @@ class Player(QWidget, Ui_Player):
         self.send_answer_button.setText('Submit')
         self.horizontalLayout.addWidget(self.send_answer_button)
         self.verticalLayout_5.addLayout(self.horizontalLayout)
+
+    
+    @Slot(str)
+    def set_scenario(self, text):
+        self.player_scenario_text.setText(text)
