@@ -1,0 +1,22 @@
+{
+    "id": 17,
+    "date": "2021-09-26",
+    "title": "The flood zone",
+    "scenario": "Your organization is located within a flood zone. Winter weather combined with\nwarming temperatures has caused flooding throughout the area. Local authorities have declared a state of emergency. In the midst of managing the flooding, a ransomware attack occurs on your facility, making computer systems inoperable.",
+    "objectives": [
+        "Tabletop exercises are meant to help organizations consider different risk scenarios and prepare for potential cyber threats. All of the exercises featured in this white paper can be completed in as little as 15 minutes, making them a convenient tool for putting your team in the cybersecurity mindset.",
+        "Each scenario will list the processes that are tested, threat actors that are identified, and the assets that are impacted."
+    ],
+    "injects": [
+        "You confirm the computer in the payroll department was used to make the additions. Approximately two weeks prior to the addition of the new personnel, there was a physical break-in to the finance department in which several laptops without sensitive data were taken.",
+        "Further review indicates that all employees are paying a new \"fee\" of $20 each paycheck and that money is being siphoned to an off-shore bank account."
+    ],
+    "Question 1": "(Weight: 3) - Do you have a COOP (Continuity of Operations Plan) or DRP (Disaster Recovery Plan)?",
+    "Answer 1": "One of your organization\u2019s internal departments frequently uses outside cloud storage to store large amounts of data, some of which may be considered sensitive.",
+    "Question 2": "(Weight: 5) - Do you have an Incident Response Plan (IRP) that specifically details ransomware steps?",
+    "Answer 2": "A routine financial audit reveals that several people receiving paychecks are not, and have never been, on payroll.",
+    "Question 3": "(Weight: 7) - Do you have a backup for completing Emergency Operations Center (EOC) processes without a computer system?",
+    "Answer 3": "Your organization is located within a flood zone. Winter weather combined with warming temperatures has caused flooding throughout the area.",
+    "Question 4": "(Weight: 8) - Who do you need to notify, and how will you do so?",
+    "Answer 4": "Local authorities have declared a state of emergency. In the midst of managing the flooding, a ransomware attack occurs on your facility, making computer systems inoperable."
+}

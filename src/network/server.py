@@ -1,44 +1,51 @@
-import socket 
-import threading
+import socket
+from PySide6.QtCore import QObject, Signal, Slot
 
+HOST = '127.0.0.1'
+PORT = 55555
+
+class ServerSignals(QObject):
+    server_signal = Signal(int)
 
 class Server():
-    def __init__(self):
-        self.HEADER = 64
-        self.DISCONNECT_MESSAGE = "!DISCONNECT"
-        self.PORT = 5050
-        self.SERVER = socket.gethostbyname(socket.gethostname())
-        self.ADDR = (self.SERVER, self.PORT)
+    def __init__(self):  
+        self.server_running = True
+        self.clients = []
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.bind((HOST, PORT))
+        self.server_socket.settimeout(0.1)
+        self.server_signal = ServerSignals()
+        print('Server listening...')
+        self.server_socket.listen()
 
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind(self.ADDR)
+    def send_to_all(self, message):
+        for client in self.clients:
+            client.sendall(message.encode())
 
-    
-    def handle_client(self, conn, addr):
-        
-        print(f"[NEW CONNECTION] {addr} connected.")
+    def accept_clients(self, msg):
+        while self.server_running:
+            try:
+                client, address = self.server_socket.accept()
+                if client:
+                    client.sendall(msg.encode())                # scenario text
+                    print(f'Connection from {str(address)}')
+                    self.clients.append(client)
+                    self.server_signal.server_signal.emit(len(self.clients))
+                else:
+                    self.clients.remove(client)
+                    self.server_signal.server_signal.emit(len(self.clients))
+               
+            except socket.timeout:
+                pass
+                
+        print('Server shutting down')
+        self.server_socket.close()
 
-        connected = True
-        while connected:
-            msg_length = conn.recv(self.HEADER).decode('utf-8')
-            if msg_length:
-                msg_length = int(msg_length)
-                msg = conn.recv(msg_length).decode('utf-8')
-                if msg == self.DISCONNECT_MESSAGE:
-                    connected = False
+    def shutdown_server(self):
+        if len(self.clients) != 0:
+            self.send_to_all('!DISCONNECT')
+        self.server_running = False
 
-                print(f"[{addr}] {msg}")
-                conn.send("Msg received".encode('utf-8'))   # send to client
-
-        conn.close()
-
-
-    def start(self):
-        print("[STARTING] server is starting...")
-        self.server.listen()
-        print(f"[LISTENING] Server is listening on {self.SERVER}")
-        while True:
-            conn, addr = self.server.accept()
-            thread = threading.Thread(target=self.handle_client, args=(conn, addr))
-            thread.start()
-            print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+    @Slot(str)
+    def send_time(self, time):
+        self.send_to_all(f'!TIME{time}')

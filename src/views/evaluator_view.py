@@ -3,6 +3,7 @@ from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtCore import Qt
 from src.uic.evaluator import Ui_Evaluator
 from ..lite import Database
+import json
 
 
 class Evaluator(QWidget, Ui_Evaluator):
@@ -15,18 +16,23 @@ class Evaluator(QWidget, Ui_Evaluator):
 
     def init_widgets(self):
         self.delete_button.setEnabled(False)
+        self.export_button.setEnabled(False)
+        self.start_button.setEnabled(False)
         self.table_view_handler()
 
 
     def assign_widgets(self):
-        self.delete_button.clicked.connect(lambda: self.delete_selected_scenario())
         self.scenarios_tree.selectionModel().selectionChanged.connect(lambda: self.on_selection_change())
+        self.delete_button.clicked.connect(lambda: self.delete_selected_scenario())
+        self.export_button.clicked.connect(lambda: self.export_to_json())
 
 
     def on_selection_change(self):
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item:
             self.delete_button.setEnabled(True)
+            self.export_button.setEnabled(True)
+            self.start_button.setEnabled(True)
 
 
     def table_view_handler(self):
@@ -77,3 +83,59 @@ class Evaluator(QWidget, Ui_Evaluator):
             db.query_db(q1, [id])
             db.query_db(q2, [id])
             self.items_model.removeRow(selected_item[0].row()) 
+
+
+    def get_selected_id(self):
+        selected_item = self.scenarios_tree.selectionModel().selectedRows()
+        if selected_item: 
+            id = self.items_model.itemFromIndex(selected_item[0]).data()
+            return id
+
+        return None
+
+
+    def get_from_db(self):
+        id = self.get_selected_id()
+        if id:
+            db = Database('scenes.db')
+            scenarios_q = "SELECT * FROM scenarios WHERE id = ?"
+            qaw_q = "SELECT question, answer, weight FROM qaw WHERE scenario = ?"
+
+            scenarios_r = db.query_db(scenarios_q, [id])[0]
+            objectives = [o for o in scenarios_r[3:8] if o is not None]
+            injects = [i for i in scenarios_r[8:13] if i is not None]
+
+            qaw_r = db.query_db(qaw_q, [id])
+
+            result = {
+                'id': scenarios_r[0],
+                'date': scenarios_r[-1],
+                'title': scenarios_r[1].capitalize(),
+                'scenario': scenarios_r[2],
+                'objectives': objectives,
+                'injects': injects,
+                'qaw': qaw_r 
+            }
+
+            return result
+
+        return None
+
+
+    # TODO file chooser + set file name to scenario title
+    # TODO export to txt, import from file
+    # TODO capitalize keys
+    def export_to_json(self):
+        result = self.get_from_db()
+        if result:
+            i = 0
+            for qaw in result['qaw']:
+                result['Question ' + str(i+1)] = '(Weight: ' + str(qaw[2]) + ') - ' + qaw[0]
+                result['Answer ' + str(i+1)] = qaw[1]
+                i += 1
+
+            del result['qaw']
+
+            with open('export.json', 'w') as f:
+                json.dump(result, f, indent=4)
+            
