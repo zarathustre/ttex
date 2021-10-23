@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import QWidget, QHeaderView
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtCore import Qt
+
 from src.uic.evaluator import Ui_Evaluator
 from ..lite import Database
+
 import json
 
 

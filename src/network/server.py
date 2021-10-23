@@ -1,5 +1,7 @@
-import socket
 from PySide6.QtCore import QObject, Signal, Slot
+
+import socket
+import threading
 
 HOST = '127.0.0.1'
 PORT = 55555
@@ -18,6 +20,10 @@ class Server():
         print('Server listening...')
         self.server_socket.listen()
 
+    @Slot(str)
+    def send_time(self, time):
+        self.send_to_all(f'!TIME{time}')
+
     def send_to_all(self, message):
         for client in self.clients:
             client.sendall(message.encode())
@@ -31,9 +37,9 @@ class Server():
                     print(f'Connection from {str(address)}')
                     self.clients.append(client)
                     self.server_signal.server_signal.emit(len(self.clients))
-                else:
-                    self.clients.remove(client)
-                    self.server_signal.server_signal.emit(len(self.clients))
+
+                    receive_dc_thread = threading.Thread(target=self.receive_disconnect_message, args=(client, ), daemon=True)
+                    receive_dc_thread.start()
                
             except socket.timeout:
                 pass
@@ -41,11 +47,17 @@ class Server():
         print('Server shutting down')
         self.server_socket.close()
 
+    def receive_disconnect_message(self, client):
+        while self.server_running:
+            try:
+                msg = client.recv(1024).decode()
+                if msg == '!DISC':
+                    self.clients.remove(client)
+                    self.server_signal.server_signal.emit(len(self.clients))
+            except socket.timeout:
+                pass
+
     def shutdown_server(self):
         if len(self.clients) != 0:
             self.send_to_all('!DISCONNECT')
         self.server_running = False
-
-    @Slot(str)
-    def send_time(self, time):
-        self.send_to_all(f'!TIME{time}')

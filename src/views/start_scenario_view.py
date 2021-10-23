@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QWidget
+
 from src.uic.start_scenario_page import Ui_StartScenario
 
 
