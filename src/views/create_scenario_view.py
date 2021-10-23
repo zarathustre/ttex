@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QTextEdit, QHBoxLayout, QComboBox, QMessageBox
+
 from src.uic.create_scenario_page import Ui_create_scenario_page
 from src.lite import Database
-from PySide6.QtCore import QThreadPool
 
 
 class CreateScenario(QWidget, Ui_create_scenario_page):
@@ -13,7 +13,6 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
 
     # Initialize widgets
     def init_widgets(self):
-        self.threadpool = QThreadPool()
         self.create_scenario_tab.setCurrentIndex(0)
         self.question_combo_box.setFixedWidth(50)
         for i in range(10):

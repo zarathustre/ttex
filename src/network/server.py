@@ -1,6 +1,7 @@
+from PySide6.QtCore import QObject, Signal, Slot
+
 import socket
 import threading
-from PySide6.QtCore import QObject, Signal, Slot
 
 HOST = '127.0.0.1'
 PORT = 55555
@@ -18,6 +19,10 @@ class Server():
         self.server_signal = ServerSignals()
         print('Server listening...')
         self.server_socket.listen()
+
+    @Slot(str)
+    def send_time(self, time):
+        self.send_to_all(f'!TIME{time}')
 
     def send_to_all(self, message):
         for client in self.clients:
@@ -56,7 +61,3 @@ class Server():
         if len(self.clients) != 0:
             self.send_to_all('!DISCONNECT')
         self.server_running = False
-
-    @Slot(str)
-    def send_time(self, time):
-        self.send_to_all(f'!TIME{time}')

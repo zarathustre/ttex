@@ -1,7 +1,9 @@
 from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton
 from PySide6.QtCore import QObject, Signal, Slot, QTime
+
 from src.uic.evaluator_start import Ui_EvaluatorStart
 from src.network.server import Server
+
 import time
 import threading
 from functools import partial
