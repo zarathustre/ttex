@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton
-from PySide6.QtCore import QObject, Signal, Slot
+from PySide6.QtCore import QObject, Signal, Slot, QTime
 from src.uic.evaluator_start import Ui_EvaluatorStart
+from src.network.server import Server
 import time
 import threading
+from functools import partial
 
 
 class EvaluatorSignals(QObject):
@@ -27,10 +29,38 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
     def assign_widgets(self):
         self.start_timer_button.clicked.connect(lambda: self.start_timer_thread())
 
+
+    def init_connection(self, values):
+        self.server = Server()
+        self.server_thread = threading.Thread(target=self.server.accept_clients,\
+            args=(f"!SCENARIO{values['scenario']}", ), daemon=True)
+
+    
+    def assign_connection_widgets(self, values):
+        self.server.server_signal.server_signal.connect(self.set_lobby_counter)
+        self.time_signal.time_signal.connect(self.server.send_time)
+
+        injects = values['injects']
+        send_inject_buttons = self.injects_group.findChildren(QToolButton)
+        for button in send_inject_buttons:
+            i = int(button.objectName()[-1])
+            button.clicked.connect(partial(self.server.send_to_all, f'!INJECT{injects[i]}'))
+
+        questions = [q[0] for q in values['qaw']]
+        send_question_buttons = self.questions_group.findChildren(QToolButton)
+        for button in send_question_buttons:
+            i = int(button.objectName()[-1])
+            button.clicked.connect(partial(self.server.send_to_all, f'!QUESTION{questions[i]}'))
+
         
     @Slot(int)
     def set_lobby_counter(self, logged_in):
         self.lobby_counter.display(logged_in)
+
+
+    def set_timer_false(self):
+        self.timer_running = False
+        self.timer_paused = False
 
         
     def start_timer_thread(self):
@@ -44,7 +74,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.time_bar.setValue(time_limit)
         thread = threading.Thread(target=self.start_timer, args=(time_limit, ), daemon=True)
         thread.start()
-        #self.time_edit.clear()
+        self.time_edit.setTime(QTime(0,0))
 
 
     def pause_timer(self):

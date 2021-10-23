@@ -1,14 +1,13 @@
-from PySide6.QtWidgets import QMainWindow, QToolButton
+from PySide6.QtWidgets import QMainWindow
+
 from src.uic.main_window import Ui_MainWindow
 from .create_scenario_view import CreateScenario
 from .start_scenario_view import StartScenario
 from .evaluator_view import Evaluator
 from .evaluator_start_view import EvaluatorStart
 from .player_view import Player
+
 import threading
-from functools import partial
-from src.network.server import Server
-from src.network.client import Client
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -18,127 +17,90 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assign_widgets()
         self.show()
 
-
     def assign_widgets(self):
         self.create_scenario_button.clicked.connect(lambda: self.create_scenario())
         self.start_scenario_button.clicked.connect(lambda: self.start_scenario())
 
-
     def start_scenario(self):
         self.start_scenario_obj = StartScenario()
-        self.main_stack.addWidget(self.start_scenario_obj)
-        self.main_stack.setCurrentIndex(1)
+        self.add_widget_and_change_tab(self.main_stack, self.start_scenario_obj, 1)
+        self.assign_start_scenario_widgets()
 
-        # assign widgets
-        self.start_scenario_obj.back_button.clicked.connect(lambda: clear_and_back())
-        self.start_scenario_obj.evaluator_button.clicked.connect(lambda: create_evaluator())
-        self.start_scenario_obj.start_stack.currentChanged.connect(lambda: self.start_scenario_obj.on_tab_change(clear_and_back))
-        self.start_scenario_obj.player_button.clicked.connect(lambda: create_player())
+    def assign_start_scenario_widgets(self):
+        self.start_scenario_obj.back_button.clicked.connect(lambda: self.delete_objects_and_go_back(self.start_scenario_obj))
+        self.start_scenario_obj.evaluator_button.clicked.connect(lambda: self.create_evaluator())
+        self.start_scenario_obj.player_button.clicked.connect(lambda: self.create_player())
+        self.start_scenario_obj.start_stack.currentChanged.connect(\
+            lambda: self.start_scenario_obj.on_tab_change(\
+                lambda: self.delete_objects_and_go_back(self.start_scenario_obj)))
 
+    def create_evaluator(self):
+        self.evaluator_obj = Evaluator()
+        self.add_widget_and_change_tab(self.start_scenario_obj.start_stack, self.evaluator_obj, 1)
+        self.assign_create_evaluator_widgets()
 
-        def clear_and_back():
-            self.main_stack.setCurrentIndex(0)
-            self.start_scenario_obj.deleteLater()
-
-
-        def create_evaluator():
-            evaluator_obj = Evaluator()
-            self.start_scenario_obj.start_stack.addWidget(evaluator_obj)  
-            self.start_scenario_obj.start_stack.setCurrentIndex(1)
-            evaluator_obj.create_from_start_button.clicked.connect(lambda: create_from_start())
-            evaluator_obj.start_button.clicked.connect(lambda: evaluator_start())
-            
-
-            def create_from_start():
-                self.create_scenario()
-                evaluator_obj.deleteLater()
-                self.start_scenario_obj.deleteLater()
-
+    def assign_create_evaluator_widgets(self):
+        self.evaluator_obj.create_from_start_button.clicked.connect(lambda: self.create_scenario_from_evaluator())
+        self.evaluator_obj.start_button.clicked.connect(lambda: self.start_evaluator_scenario())
         
-            def evaluator_start():
-                evaluator_start_obj = EvaluatorStart()
-                self.main_stack.addWidget(evaluator_start_obj)
-                self.main_stack.setCurrentIndex(2)
+    def create_scenario_from_evaluator(self):
+        self.create_scenario()
+        self.delete_objects(self.evaluator_obj, self.start_scenario_obj)
+    
+    def start_evaluator_scenario(self):
+        self.start_evaluator_scenario_obj = EvaluatorStart()
+        self.add_widget_and_change_tab(self.main_stack, self.start_evaluator_scenario_obj, 2)
+        self.init_start_evaluator_scenario()
 
-                evaluator_start_obj.terminate_button.clicked.connect(lambda: clear_all_back())
+    def init_start_evaluator_scenario(self):
+        self.start_evaluator_scenario_obj.terminate_button.clicked.connect(lambda: self.terminate_evaluator())
+        values = self.evaluator_obj.get_from_db()
+        if values: 
+            self.start_evaluator_scenario_obj.assign_fields(values)       
+            self.start_evaluator_scenario_obj.init_connection(values)
+            self.start_evaluator_scenario_obj.server_thread.start()
+            self.start_evaluator_scenario_obj.assign_connection_widgets(values)
 
-                values = evaluator_obj.get_from_db()
-                if values:
-                    evaluator_start_obj.assign_fields(values)
-                
-                server = Server()
-                server_thread = threading.Thread(target=server.accept_clients,\
-                    args=(f"!SCENARIO{values['scenario']}", ), daemon=True)
-                server_thread.start()
+    def terminate_evaluator(self):
+        self.start_evaluator_scenario_obj.server.shutdown_server()
+        self.start_evaluator_scenario_obj.set_timer_false()
+        self.delete_objects_and_go_back(self.start_evaluator_scenario_obj, self.evaluator_obj, self.start_scenario_obj)
 
-                server.server_signal.server_signal.connect(evaluator_start_obj.set_lobby_counter)
-                evaluator_start_obj.time_signal.time_signal.connect(server.send_time)
+    # TODO: send back the answers for every question
+    def create_player(self):
+        self.player = Player()
+        self.add_widget_and_change_tab(self.main_stack, self.player, 2)
+        self.player.player_terminate_button.clicked.connect(lambda: self.terminate_player())
+        self.player.client_thread.start()
 
-                injects = values['injects']
-                send_inject_buttons = evaluator_start_obj.injects_group.findChildren(QToolButton)
-                for button in send_inject_buttons:
-                    i = int(button.objectName()[-1])
-                    button.clicked.connect(partial(server.send_to_all, f'!INJECT{injects[i]}'))
+    def terminate_player(self):
+        self.player.client.shutdown_client()
+        self.delete_objects_and_go_back(self.player, self.start_scenario_obj)
 
-                questions = [q[0] for q in values['qaw']]
-                send_question_buttons = evaluator_start_obj.questions_group.findChildren(QToolButton)
-                for button in send_question_buttons:
-                    i = int(button.objectName()[-1])
-                    button.clicked.connect(partial(server.send_to_all, f'!QUESTION{questions[i]}'))
-
-                def clear_all_back():
-                    server.shutdown_server()
-                    evaluator_start_obj.timer_running = False
-                    evaluator_start_obj.timer_paused = False
-                    self.main_stack.setCurrentIndex(0)
-                    evaluator_start_obj.deleteLater()
-                    evaluator_obj.deleteLater()
-                    self.start_scenario_obj.deleteLater()
-
-
-        # TODO: reset time edit when the timer is started
-        # TODO: send back the answers for every question
-        # TODO: adjust number of logged in clients when a client disconnects
-        def create_player():
-            player = Player()
-            self.main_stack.addWidget(player)
-            self.main_stack.setCurrentIndex(2)
-            player.player_tab.setCurrentIndex(0)
-            player.player_terminate_button.clicked.connect(lambda: terminate_player())
-
-            client = Client()
-            client_thread = threading.Thread(target=client.receive,\
-                args=(player.signals.inject_signal, player.signals.question_signal, player.signals.scenario_signal,\
-                    player.player_time_counter, ), daemon=True)
-            client_thread.start()
-
-            def terminate_player():
-                client.shutdown_client()
-                self.main_stack.setCurrentIndex(0)
-                player.deleteLater()
-                self.start_scenario_obj.deleteLater()
-
-
-    # Handles the creation of a new scenario
     def create_scenario(self):
-        self.create_scenario_obj = CreateScenario()              # create scenario object
-        self.main_stack.addWidget(self.create_scenario_obj)      # add object to main stack
-        self.main_stack.setCurrentIndex(1)                       # switch main stack to show created object
+        self.create_scenario_obj = CreateScenario() 
+        self.add_widget_and_change_tab(self.main_stack, self.create_scenario_obj, 1)                     
 
-        # assign widgets
-        self.create_scenario_obj.back_button.clicked.connect(lambda: clear_and_back())     # back button
+        self.create_scenario_obj.back_button.clicked.connect(\
+            lambda: self.delete_objects_and_go_back(self.create_scenario_obj))
 
         self.create_scenario_obj.create_scenario_tab.currentChanged.connect(\
-            lambda: self.create_scenario_obj.on_tab_change(save_and_back))                 # tabbed widget
+            lambda: self.create_scenario_obj.on_tab_change(self.save_delete_go_back))     
 
-        # Save entries of the create scenario in the database
-        def save_and_back():
-            if self.create_scenario_obj.check_constraints():
-                thread = threading.Thread(target=self.create_scenario_obj.save_to_db)
-                thread.start()
-                clear_and_back()
+    def save_delete_go_back(self):
+        if self.create_scenario_obj.check_constraints():
+            thread = threading.Thread(target=self.create_scenario_obj.save_to_db)
+            thread.start()
+            self.delete_objects_and_go_back(self.create_scenario_obj)
 
-        # Change the main stack to the first one and delete the create scenario object
-        def clear_and_back():
-            self.main_stack.setCurrentIndex(0) 
-            self.create_scenario_obj.deleteLater()         # delete create scenario object
+    def delete_objects_and_go_back(self, *args):
+        self.main_stack.setCurrentIndex(0)
+        self.delete_objects(*args)
+
+    def delete_objects(self, *args):
+        for arg in args:
+            arg.deleteLater()
+
+    def add_widget_and_change_tab(self, stack, widget, tab):
+        stack.addWidget(widget)
+        stack.setCurrentIndex(tab)

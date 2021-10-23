@@ -1,4 +1,5 @@
 import socket
+import threading
 from PySide6.QtCore import QObject, Signal, Slot
 
 HOST = '127.0.0.1'
@@ -31,15 +32,25 @@ class Server():
                     print(f'Connection from {str(address)}')
                     self.clients.append(client)
                     self.server_signal.server_signal.emit(len(self.clients))
-                else:
-                    self.clients.remove(client)
-                    self.server_signal.server_signal.emit(len(self.clients))
+
+                    receive_dc_thread = threading.Thread(target=self.receive_disconnect_message, args=(client, ), daemon=True)
+                    receive_dc_thread.start()
                
             except socket.timeout:
                 pass
                 
         print('Server shutting down')
         self.server_socket.close()
+
+    def receive_disconnect_message(self, client):
+        while self.server_running:
+            try:
+                msg = client.recv(1024).decode()
+                if msg == '!DISC':
+                    self.clients.remove(client)
+                    self.server_signal.server_signal.emit(len(self.clients))
+            except socket.timeout:
+                pass
 
     def shutdown_server(self):
         if len(self.clients) != 0:
