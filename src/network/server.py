@@ -8,6 +8,7 @@ PORT = 55555
 
 class ServerSignals(QObject):
     server_signal = Signal(int)
+    receive_answer_signal = Signal(str)
 
 class Server():
     def __init__(self):  
@@ -38,7 +39,7 @@ class Server():
                     self.clients.append(client)
                     self.server_signal.server_signal.emit(len(self.clients))
 
-                    receive_dc_thread = threading.Thread(target=self.receive_disconnect_message, args=(client, ), daemon=True)
+                    receive_dc_thread = threading.Thread(target=self.receive_message, args=(client, ), daemon=True)
                     receive_dc_thread.start()
                
             except socket.timeout:
@@ -47,13 +48,16 @@ class Server():
         print('Server shutting down')
         self.server_socket.close()
 
-    def receive_disconnect_message(self, client):
+    def receive_message(self, client):
         while self.server_running:
             try:
                 msg = client.recv(1024).decode()
                 if msg == '!DISC':
                     self.clients.remove(client)
                     self.server_signal.server_signal.emit(len(self.clients))
+                
+                if msg.startswith('!ANSWER'):
+                    self.server_signal.receive_answer_signal.emit(f'{msg[7:]}')
             except socket.timeout:
                 pass
 
