@@ -22,7 +22,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
 
         
     def init_widgets(self):
-        self.time_signal = EvaluatorSignals()
+        self.signals = EvaluatorSignals()
         self.evaluator_start_tab.setCurrentIndex(0)
         self.timer_running = True
         self.timer_paused = False
@@ -40,7 +40,8 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
     
     def assign_connection_widgets(self, values):
         self.server.server_signal.server_signal.connect(self.set_lobby_counter)
-        self.time_signal.time_signal.connect(self.server.send_time)
+        self.server.server_signal.receive_answer_signal.connect(self.receive_answer)
+        self.signals.time_signal.connect(self.server.send_time)
 
         injects = values['injects']
         send_inject_buttons = self.injects_group.findChildren(QToolButton)
@@ -53,6 +54,11 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         for button in send_question_buttons:
             i = int(button.objectName()[-1])
             button.clicked.connect(partial(self.server.send_to_all, f'!QUESTION{questions[i]}'))
+
+
+    @Slot(str)
+    def receive_answer(self, msg):
+        print(msg)
 
         
     @Slot(int)
@@ -89,7 +95,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         
 
     def start_timer(self, time_limit): 
-        self.time_signal.time_signal.emit(str(time_limit))
+        self.signals.time_signal.emit(str(time_limit))
         while time_limit >= 0:
             
             if not self.timer_running:
@@ -101,13 +107,13 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
 
             if time_limit == 0:
                 self.time_counter.display(0)
-                self.time_signal.time_signal.emit('0')
+                self.signals.time_signal.emit('0')
                 break
 
             time_limit -= 1
-            self.time_bar.setValue(time_limit)              
+            self.time_bar.setValue(time_limit)                      # TODO: this is raising an error              
             self.time_counter.display((time_limit // 60) + 1)      
-            self.time_signal.time_signal.emit(str(time_limit))
+            self.signals.time_signal.emit(str(time_limit))
             time.sleep(1)
 
         print('Done')
