@@ -15,7 +15,7 @@ class Player(QWidget, Ui_Player):
         self.init_widgets()
         self.init_connection()
         self.assign_connection_widgets()
-        
+
 
     def init_widgets(self):
         self.player_tab.setCurrentIndex(0)
@@ -29,6 +29,11 @@ class Player(QWidget, Ui_Player):
         self.client.client_signals.scenario_signal.connect(self.set_scenario)
         self.client.client_signals.inject_signal.connect(self.set_inject)
         self.client.client_signals.question_signal.connect(self.set_question)
+        self.client.client_signals.team_nick_signal.connect(self.set_team_nickname)
+
+    @Slot(str)
+    def set_team_nickname(self, nick):
+        self.team_nick_label.setText(f'Team {nick}')
 
     @Slot(str)
     def set_scenario(self, text):
@@ -55,10 +60,8 @@ class Player(QWidget, Ui_Player):
         self.verticalLayout_5.addWidget(self.question_label)
         self.horizontalLayout = QHBoxLayout()
         self.answer_text = QTextEdit(self.player_questions_group)
-        self.answer_text.setObjectName(f'answer_text_{count}')
         self.horizontalLayout.addWidget(self.answer_text)
         self.send_answer_button = QToolButton(self.player_questions_group)
-        self.send_answer_button.setObjectName(f'send_answer_button_{count}')
         self.send_answer_button.setText('Submit')
         self.horizontalLayout.addWidget(self.send_answer_button)
         self.verticalLayout_5.addLayout(self.horizontalLayout)

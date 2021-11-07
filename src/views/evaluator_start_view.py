@@ -55,10 +55,18 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             i = int(button.objectName()[-1])
             button.clicked.connect(partial(self.server.send_to_all, f'!QUESTION{questions[i]}'))
 
+    # TODO
+    # - On evaluator's 3rd tab, create a tab for each connected player
+    # - Fill the received answers 
+    # - Handle the evaluation and scoring of the received answers
 
     @Slot(str)
     def receive_answer(self, msg):
-        print(msg)
+        question_answer = msg.split('!A!')
+        question = question_answer[0]
+        answer = question_answer[1]
+        print(f'Question: {question}')
+        print(f'Answer: {answer}')
 
         
     @Slot(int)

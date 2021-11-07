@@ -17,6 +17,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.assign_widgets()
         self.show()
 
+    def closeEvent(self, event):
+        if hasattr(self, 'start_evaluator_scenario_obj'): 
+            self.start_evaluator_scenario_obj.server.shutdown_server()
+        elif hasattr(self, 'player'): 
+            self.player.client.shutdown_client()
+        event.accept()
+
     def assign_widgets(self):
         self.create_scenario_button.clicked.connect(lambda: self.create_scenario())
         self.start_scenario_button.clicked.connect(lambda: self.start_scenario())
@@ -66,7 +73,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.start_evaluator_scenario_obj.set_timer_false()
         self.delete_objects_and_go_back(self.start_evaluator_scenario_obj, self.evaluator_obj, self.start_scenario_obj)
 
-    # TODO: send back the answers for every question
     def create_player(self):
         self.player = Player()
         self.add_widget_and_change_tab(self.main_stack, self.player, 2)
