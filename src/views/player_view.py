@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QTextEdit, QToolButton
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit, QToolButton
 from PySide6.QtCore import Slot
 
 from src.uic.player import Ui_Player
 from src.network.client import Client
+from src.common_tools import add_label, add_horizontal_line, add_tool_button
 
 import threading
 from functools import partial
@@ -16,10 +17,8 @@ class Player(QWidget, Ui_Player):
         self.init_connection()
         self.assign_connection_widgets()
 
-
     def init_widgets(self):
         self.player_tab.setCurrentIndex(0)
-
 
     def init_connection(self):
         self.client = Client()
@@ -41,32 +40,21 @@ class Player(QWidget, Ui_Player):
 
     @Slot(str)
     def set_inject(self, text):
-        self.inject_label = QLabel(self.player_injects_group)
-        self.inject_label.setText(text)
-        self.inject_label.setWordWrap(True)
-        self.line = QFrame(self.player_injects_group)
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_4.addWidget(self.inject_label)
-        self.verticalLayout_4.addWidget(self.line)
+        add_label(self.player_injects_group, self.verticalLayout_4, text)
+        add_horizontal_line(self.player_injects_group, self.verticalLayout_4)
 
     @Slot(str)
-    def set_question(self, text):
+    def set_question(self, question_text):
         count = len(self.player_questions_group.findChildren(QToolButton))
-        self.question_label = QLabel(self.player_questions_group)
-        self.question_label.setObjectName(f'question_label_{count}')
-        self.question_label.setText(text)
-        self.question_label.setWordWrap(True)
-        self.verticalLayout_5.addWidget(self.question_label)
+        add_label(self.player_questions_group, self.verticalLayout_5, question_text, object_name=f'question_label_{count}')
         self.horizontalLayout = QHBoxLayout()
-        self.answer_text = QTextEdit(self.player_questions_group)
-        self.horizontalLayout.addWidget(self.answer_text)
-        self.send_answer_button = QToolButton(self.player_questions_group)
-        self.send_answer_button.setText('Submit')
-        self.horizontalLayout.addWidget(self.send_answer_button)
+        self.answer_text_edit = QTextEdit(self.player_questions_group)
+        self.horizontalLayout.addWidget(self.answer_text_edit)
+        add_tool_button(self.player_questions_group, self.horizontalLayout, text='Submit', \
+            connection=partial(self.send_answer_to_evaluator, question_text, self.answer_text_edit))
+
         self.verticalLayout_5.addLayout(self.horizontalLayout)
-        self.send_answer_button.clicked.connect(partial(self.send_answer_to_evaluator, self.question_label, self.answer_text))
 
 
-    def send_answer_to_evaluator(self, question, answer):
-        self.client.send(f'!ANSWER{self.team_nick_label.text()[-1]}{question.text()}!A!{answer.toPlainText()}')
+    def send_answer_to_evaluator(self, question, answer_text_edit):
+        self.client.send(f'!ANSWER{self.team_nick_label.text()[-1]}{question}!A!{answer_text_edit.toPlainText()}')

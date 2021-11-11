@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton, QGroupBox, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QGroupBox, QVBoxLayout
 from PySide6.QtCore import QObject, Signal, Slot, QTime
 
 from src.uic.evaluator_start import Ui_EvaluatorStart
 from src.network.server import Server
+from src.common_tools import add_horizontal_line, add_label, add_tool_button, add_horizontal_slider
 
 import time
 import threading
@@ -75,9 +76,13 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
 
         for group in self.tab_3.findChildren(QGroupBox):
             if group.objectName()[-1] == index:
-                layout = group.findChildren(QVBoxLayout)[0]
-                self.add_label(group, layout, f'Team {nick}: {answer}')
-                self.add_horizontal_line(group, layout)   
+                h_layout = QHBoxLayout()
+                add_label(group, h_layout, f'Team {nick}: {answer}')
+                add_horizontal_slider(group, h_layout)
+
+                v_layout = group.findChildren(QVBoxLayout)[0]
+                v_layout.addLayout(h_layout)
+                add_horizontal_line(group, v_layout)   
 
         
     @Slot(int)
@@ -143,67 +148,37 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.scenario_text.setText(dict['scenario'])        # scenario
 
         # objectives
-        self.add_horizontal_line(self.objectives_group, self.verticalLayout_3)
+        add_horizontal_line(self.objectives_group, self.verticalLayout_3)
         for objective in dict['objectives']:
-            self.add_label(self.objectives_group, self.verticalLayout_3, objective)
-            self.add_horizontal_line(self.objectives_group, self.verticalLayout_3)
+            add_label(self.objectives_group, self.verticalLayout_3, objective)
+            add_horizontal_line(self.objectives_group, self.verticalLayout_3)
 
         # injects
         i = 0
-        self.add_horizontal_line(self.injects_group, self.verticalLayout_5)      
+        add_horizontal_line(self.injects_group, self.verticalLayout_5)      
         for inject in dict['injects']:
             horizontalLayout = QHBoxLayout()
-            self.add_label(self.injects_group, horizontalLayout, inject, True)
-            self.add_tool_button(self.injects_group, horizontalLayout, f'send_inject_button_{i}', 'Send')
+            add_label(self.injects_group, horizontalLayout, inject, size_policy=True)
+            add_tool_button(self.injects_group, horizontalLayout, text='Send', object_name=f'send_inject_button_{i}')
             self.verticalLayout_5.addLayout(horizontalLayout)
-            self.add_horizontal_line(self.injects_group, self.verticalLayout_5)
+            add_horizontal_line(self.injects_group, self.verticalLayout_5)
             i += 1
 
         # questions
         i = 0
-        self.add_horizontal_line(self.questions_group, self.verticalLayout_6)
+        add_horizontal_line(self.questions_group, self.verticalLayout_6)
         for qaw in dict['qaw']:
             horizontalLayout = QHBoxLayout()
-            self.add_label(self.questions_group, horizontalLayout, qaw[0], size_policy=True)
-            self.add_tool_button(self.questions_group, horizontalLayout, f'send_question_button_{i}', 'Send')
+            add_label(self.questions_group, horizontalLayout, qaw[0], size_policy=True)
+            add_tool_button(self.questions_group, horizontalLayout, text='Send', object_name=f'send_question_button_{i}')
             self.verticalLayout_6.addLayout(horizontalLayout)
-            self.add_horizontal_line(self.questions_group, self.verticalLayout_6)
+            add_horizontal_line(self.questions_group, self.verticalLayout_6)
 
             # tab 3 questions
-            self.add_label(self.tab_3, self.verticalLayout_7, qaw[0], object_name=f'eval_question_label_{i}')
+            add_label(self.tab_3, self.verticalLayout_7, qaw[0], object_name=f'eval_question_label_{i}')
             questions_answers_group = QGroupBox(self.tab_3)
             questions_answers_group.setObjectName(f"questions_answers_group_{i}")
             v_layout = QVBoxLayout(questions_answers_group)
             self.verticalLayout_7.addWidget(questions_answers_group)
 
             i += 1
-
-
-    def add_horizontal_line(self, parent, parent_layout):
-        line = QFrame(parent)
-        line.setFrameShape(QFrame.HLine)
-        line.setFrameShadow(QFrame.Sunken)
-        parent_layout.addWidget(line)
-
-    def add_label(self, parent, parent_layout, label_text, size_policy=False, object_name=''):
-        label = QLabel(parent)
-        if size_policy:
-            self.add_size_policy(label)
-        if object_name != '':
-            label.setObjectName(object_name)
-        label.setText(label_text)
-        label.setWordWrap(True)
-        parent_layout.addWidget(label)
-
-    def add_size_policy(self, label):
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
-        label.setSizePolicy(sizePolicy)
-
-    def add_tool_button(self, parent, parent_layout, object_name, button_text):
-        t_button = QToolButton(parent)
-        t_button.setObjectName(object_name)
-        t_button.setText(button_text)
-        parent_layout.addWidget(t_button)
