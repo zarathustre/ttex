@@ -69,4 +69,4 @@ class Player(QWidget, Ui_Player):
 
 
     def send_answer_to_evaluator(self, question, answer):
-        self.client.send(f'!ANSWER{question.text()}!A!{answer.toPlainText()}')
+        self.client.send(f'!ANSWER{self.team_nick_label.text()[-1]}{question.text()}!A!{answer.toPlainText()}')

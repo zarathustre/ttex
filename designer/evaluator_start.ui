@@ -59,7 +59,7 @@
    <item>
     <widget class="QTabWidget" name="evaluator_start_tab">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
@@ -187,6 +187,7 @@
       <attribute name="title">
        <string>Tab 3</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7"/>
      </widget>
     </widget>
    </item>

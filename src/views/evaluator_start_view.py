@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton
+from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton, QGroupBox, QVBoxLayout
 from PySide6.QtCore import QObject, Signal, Slot, QTime
 
 from src.uic.evaluator_start import Ui_EvaluatorStart
@@ -26,7 +26,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.evaluator_start_tab.setCurrentIndex(0)
         self.timer_running = True
         self.timer_paused = False
-    
+
     
     def assign_widgets(self):
         self.start_timer_button.clicked.connect(lambda: self.start_timer_thread())
@@ -56,17 +56,28 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             button.clicked.connect(partial(self.server.send_to_all, f'!QUESTION{questions[i]}'))
 
     # TODO
-    # - On evaluator's 3rd tab, create a tab for each connected player
-    # - Fill the received answers 
     # - Handle the evaluation and scoring of the received answers
+    # - Disable send buttons after submission
 
     @Slot(str)
     def receive_answer(self, msg):
         question_answer = msg.split('!A!')
-        question = question_answer[0]
+        nick = question_answer[0][0]
+        question = question_answer[0][1:]
         answer = question_answer[1]
-        print(f'Question: {question}')
-        print(f'Answer: {answer}')
+        self.update_answer_tab(nick, question, answer)
+
+    
+    def update_answer_tab(self, nick, question, answer):
+        for label in self.tab_3.findChildren(QLabel):
+            if label.text() == question:
+                index = label.objectName()[-1]
+
+        for group in self.tab_3.findChildren(QGroupBox):
+            if group.objectName()[-1] == index:
+                layout = group.findChildren(QVBoxLayout)[0]
+                self.add_label(group, layout, f'Team {nick}: {answer}')
+                self.add_horizontal_line(group, layout)   
 
         
     @Slot(int)
@@ -132,79 +143,67 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.scenario_text.setText(dict['scenario'])        # scenario
 
         # objectives
-        self.line = QFrame(self.objectives_group)
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_3.addWidget(self.line)
-
+        self.add_horizontal_line(self.objectives_group, self.verticalLayout_3)
         for objective in dict['objectives']:
-            self.objective_label = QLabel(self.objectives_group)
-
-            self.objective_label.setWordWrap(True)
-            self.objective_label.setText(objective)
-
-            self.line = QFrame(self.objectives_group)
-            self.line.setFrameShape(QFrame.HLine)
-            self.line.setFrameShadow(QFrame.Sunken)
-            
-            self.verticalLayout_3.addWidget(self.objective_label)
-            self.verticalLayout_3.addWidget(self.line)
+            self.add_label(self.objectives_group, self.verticalLayout_3, objective)
+            self.add_horizontal_line(self.objectives_group, self.verticalLayout_3)
 
         # injects
-        self.line2 = QFrame(self.injects_group)
-        self.line2.setFrameShape(QFrame.HLine)
-        self.line2.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_5.addWidget(self.line2)        
-
         i = 0
+        self.add_horizontal_line(self.injects_group, self.verticalLayout_5)      
         for inject in dict['injects']:
-            self.horizontalLayout = QHBoxLayout()
-            self.inject_label = QLabel(self.injects_group)
-            sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-            sizePolicy.setHorizontalStretch(0)
-            sizePolicy.setVerticalStretch(0)
-            sizePolicy.setHeightForWidth(self.inject_label.sizePolicy().hasHeightForWidth())
-            self.inject_label.setSizePolicy(sizePolicy)
-            self.inject_label.setText(inject)
-            self.inject_label.setWordWrap(True)
-            self.send_inject_button = QToolButton(self.injects_group)
-            self.send_inject_button.setObjectName(f'send_inject_button_{i}')
-            self.send_inject_button.setText('Send')
-            self.horizontalLayout.addWidget(self.inject_label)
-            self.horizontalLayout.addWidget(self.send_inject_button)
-            self.verticalLayout_5.addLayout(self.horizontalLayout)
-            self.line = QFrame(self.injects_group)
-            self.line.setFrameShape(QFrame.HLine)
-            self.line.setFrameShadow(QFrame.Sunken)
-            self.verticalLayout_5.addWidget(self.line) 
+            horizontalLayout = QHBoxLayout()
+            self.add_label(self.injects_group, horizontalLayout, inject, True)
+            self.add_tool_button(self.injects_group, horizontalLayout, f'send_inject_button_{i}', 'Send')
+            self.verticalLayout_5.addLayout(horizontalLayout)
+            self.add_horizontal_line(self.injects_group, self.verticalLayout_5)
             i += 1
 
         # questions
-        self.line3 = QFrame(self.questions_group)
-        self.line3.setFrameShape(QFrame.HLine)
-        self.line3.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_6.addWidget(self.line3)
-
         i = 0
+        self.add_horizontal_line(self.questions_group, self.verticalLayout_6)
         for qaw in dict['qaw']:
-            self.horizontalLayout = QHBoxLayout()
-            self.question_label = QLabel(self.questions_group)
-            sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-            sizePolicy.setHorizontalStretch(0)
-            sizePolicy.setVerticalStretch(0)
-            sizePolicy.setHeightForWidth(self.question_label.sizePolicy().hasHeightForWidth())
-            self.question_label.setSizePolicy(sizePolicy)
-            self.question_label.setText(qaw[0])
-            self.question_label.setWordWrap(True)
-            self.send_question_button = QToolButton(self.questions_group)
-            self.send_question_button.setObjectName(f'send_question_button_{i}')
-            self.send_question_button.setText('Send')
-            self.horizontalLayout.addWidget(self.question_label)
-            self.horizontalLayout.addWidget(self.send_question_button)
-            self.verticalLayout_6.addLayout(self.horizontalLayout)
-            self.line = QFrame(self.questions_group)
-            self.line.setFrameShape(QFrame.HLine)
-            self.line.setFrameShadow(QFrame.Sunken)
-            self.verticalLayout_6.addWidget(self.line) 
+            horizontalLayout = QHBoxLayout()
+            self.add_label(self.questions_group, horizontalLayout, qaw[0], size_policy=True)
+            self.add_tool_button(self.questions_group, horizontalLayout, f'send_question_button_{i}', 'Send')
+            self.verticalLayout_6.addLayout(horizontalLayout)
+            self.add_horizontal_line(self.questions_group, self.verticalLayout_6)
+
+            # tab 3 questions
+            self.add_label(self.tab_3, self.verticalLayout_7, qaw[0], object_name=f'eval_question_label_{i}')
+            questions_answers_group = QGroupBox(self.tab_3)
+            questions_answers_group.setObjectName(f"questions_answers_group_{i}")
+            v_layout = QVBoxLayout(questions_answers_group)
+            self.verticalLayout_7.addWidget(questions_answers_group)
+
             i += 1
-        
+
+
+    def add_horizontal_line(self, parent, parent_layout):
+        line = QFrame(parent)
+        line.setFrameShape(QFrame.HLine)
+        line.setFrameShadow(QFrame.Sunken)
+        parent_layout.addWidget(line)
+
+    def add_label(self, parent, parent_layout, label_text, size_policy=False, object_name=''):
+        label = QLabel(parent)
+        if size_policy:
+            self.add_size_policy(label)
+        if object_name != '':
+            label.setObjectName(object_name)
+        label.setText(label_text)
+        label.setWordWrap(True)
+        parent_layout.addWidget(label)
+
+    def add_size_policy(self, label):
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
+        label.setSizePolicy(sizePolicy)
+
+    def add_tool_button(self, parent, parent_layout, object_name, button_text):
+        t_button = QToolButton(parent)
+        t_button.setObjectName(object_name)
+        t_button.setText(button_text)
+        parent_layout.addWidget(t_button)

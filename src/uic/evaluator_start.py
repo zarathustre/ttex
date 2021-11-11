@@ -127,6 +127,8 @@ class Ui_EvaluatorStart(object):
         self.evaluator_start_tab.addTab(self.tab_2, "")
         self.tab_3 = QWidget()
         self.tab_3.setObjectName(u"tab_3")
+        self.verticalLayout_7 = QVBoxLayout(self.tab_3)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.evaluator_start_tab.addTab(self.tab_3, "")
 
         self.verticalLayout.addWidget(self.evaluator_start_tab)
@@ -142,7 +144,7 @@ class Ui_EvaluatorStart(object):
 
         self.retranslateUi(EvaluatorStart)
 
-        self.evaluator_start_tab.setCurrentIndex(1)
+        self.evaluator_start_tab.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(EvaluatorStart)
