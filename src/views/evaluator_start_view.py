@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QGroupBox, QVBoxLayout
-from PySide6.QtCore import QObject, Signal, Slot, QTime
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QGroupBox, QVBoxLayout, QSlider
+from PySide6.QtCore import QObject, Signal, Slot, QTime, Qt
 
 from src.uic.evaluator_start import Ui_EvaluatorStart
 from src.network.server import Server
@@ -77,12 +77,13 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         for group in self.tab_3.findChildren(QGroupBox):
             if group.objectName()[-1] == index:
                 h_layout = QHBoxLayout()
-                add_label(group, h_layout, f'Team {nick}: {answer}')
-                add_horizontal_slider(group, h_layout)
-
+                add_label(group, h_layout, f'Team {nick}: {answer}', size_policy=True)
+                slider = add_horizontal_slider(group, h_layout, return_condition=True)
+                label = add_label(group, h_layout, '1', object_name=f'score_label_{index}_{nick}', return_condition=True)
+                slider.valueChanged.connect(lambda: label.setText(str(slider.value())))
                 v_layout = group.findChildren(QVBoxLayout)[0]
                 v_layout.addLayout(h_layout)
-                add_horizontal_line(group, v_layout)   
+                add_horizontal_line(group, v_layout)
 
         
     @Slot(int)
