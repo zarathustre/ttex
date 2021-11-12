@@ -28,6 +28,15 @@ class Ui_Player(object):
 
         self.horizontalLayout.addWidget(self.player_terminate_button)
 
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_2)
+
+        self.team_nick_label = QLabel(Player)
+        self.team_nick_label.setObjectName(u"team_nick_label")
+
+        self.horizontalLayout.addWidget(self.team_nick_label)
+
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
@@ -87,6 +96,7 @@ class Ui_Player(object):
     def retranslateUi(self, Player):
         Player.setWindowTitle(QCoreApplication.translate("Player", u"Form", None))
         self.player_terminate_button.setText(QCoreApplication.translate("Player", u"Terminate", None))
+        self.team_nick_label.setText(QCoreApplication.translate("Player", u"Team ", None))
         self.player_injects_group.setTitle(QCoreApplication.translate("Player", u"Injects", None))
         self.player_tab.setTabText(self.player_tab.indexOf(self.tab_1), QCoreApplication.translate("Player", u"Tab 1", None))
         self.player_questions_group.setTitle(QCoreApplication.translate("Player", u"Questions", None))

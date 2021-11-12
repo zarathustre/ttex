@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QWidget, QLabel, QFrame, QHBoxLayout, QSizePolicy, QToolButton
-from PySide6.QtCore import QObject, Signal, Slot, QTime
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QGroupBox, QVBoxLayout, QSlider
+from PySide6.QtCore import QObject, Signal, Slot, QTime, Qt
 
 from src.uic.evaluator_start import Ui_EvaluatorStart
 from src.network.server import Server
+from src.common_tools import add_horizontal_line, add_label, add_tool_button, add_horizontal_slider
 
 import time
 import threading
@@ -26,7 +27,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.evaluator_start_tab.setCurrentIndex(0)
         self.timer_running = True
         self.timer_paused = False
-    
+
     
     def assign_widgets(self):
         self.start_timer_button.clicked.connect(lambda: self.start_timer_thread())
@@ -55,10 +56,34 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             i = int(button.objectName()[-1])
             button.clicked.connect(partial(self.server.send_to_all, f'!QUESTION{questions[i]}'))
 
+    # TODO
+    # - Handle the evaluation and scoring of the received answers
+    # - Disable send buttons after submission
 
     @Slot(str)
     def receive_answer(self, msg):
-        print(msg)
+        question_answer = msg.split('!A!')
+        nick = question_answer[0][0]
+        question = question_answer[0][1:]
+        answer = question_answer[1]
+        self.update_answer_tab(nick, question, answer)
+
+    
+    def update_answer_tab(self, nick, question, answer):
+        for label in self.tab_3.findChildren(QLabel):
+            if label.text() == question:
+                index = label.objectName()[-1]
+
+        for group in self.tab_3.findChildren(QGroupBox):
+            if group.objectName()[-1] == index:
+                h_layout = QHBoxLayout()
+                add_label(group, h_layout, f'Team {nick}: {answer}', size_policy=True)
+                slider = add_horizontal_slider(group, h_layout, return_condition=True)
+                label = add_label(group, h_layout, '1', object_name=f'score_label_{index}_{nick}', return_condition=True)
+                slider.valueChanged.connect(lambda: label.setText(str(slider.value())))
+                v_layout = group.findChildren(QVBoxLayout)[0]
+                v_layout.addLayout(h_layout)
+                add_horizontal_line(group, v_layout)
 
         
     @Slot(int)
@@ -124,79 +149,37 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.scenario_text.setText(dict['scenario'])        # scenario
 
         # objectives
-        self.line = QFrame(self.objectives_group)
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_3.addWidget(self.line)
-
+        add_horizontal_line(self.objectives_group, self.verticalLayout_3)
         for objective in dict['objectives']:
-            self.objective_label = QLabel(self.objectives_group)
-
-            self.objective_label.setWordWrap(True)
-            self.objective_label.setText(objective)
-
-            self.line = QFrame(self.objectives_group)
-            self.line.setFrameShape(QFrame.HLine)
-            self.line.setFrameShadow(QFrame.Sunken)
-            
-            self.verticalLayout_3.addWidget(self.objective_label)
-            self.verticalLayout_3.addWidget(self.line)
+            add_label(self.objectives_group, self.verticalLayout_3, objective)
+            add_horizontal_line(self.objectives_group, self.verticalLayout_3)
 
         # injects
-        self.line2 = QFrame(self.injects_group)
-        self.line2.setFrameShape(QFrame.HLine)
-        self.line2.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_5.addWidget(self.line2)        
-
         i = 0
+        add_horizontal_line(self.injects_group, self.verticalLayout_5)      
         for inject in dict['injects']:
-            self.horizontalLayout = QHBoxLayout()
-            self.inject_label = QLabel(self.injects_group)
-            sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-            sizePolicy.setHorizontalStretch(0)
-            sizePolicy.setVerticalStretch(0)
-            sizePolicy.setHeightForWidth(self.inject_label.sizePolicy().hasHeightForWidth())
-            self.inject_label.setSizePolicy(sizePolicy)
-            self.inject_label.setText(inject)
-            self.inject_label.setWordWrap(True)
-            self.send_inject_button = QToolButton(self.injects_group)
-            self.send_inject_button.setObjectName(f'send_inject_button_{i}')
-            self.send_inject_button.setText('Send')
-            self.horizontalLayout.addWidget(self.inject_label)
-            self.horizontalLayout.addWidget(self.send_inject_button)
-            self.verticalLayout_5.addLayout(self.horizontalLayout)
-            self.line = QFrame(self.injects_group)
-            self.line.setFrameShape(QFrame.HLine)
-            self.line.setFrameShadow(QFrame.Sunken)
-            self.verticalLayout_5.addWidget(self.line) 
+            horizontalLayout = QHBoxLayout()
+            add_label(self.injects_group, horizontalLayout, inject, size_policy=True)
+            add_tool_button(self.injects_group, horizontalLayout, text='Send', object_name=f'send_inject_button_{i}')
+            self.verticalLayout_5.addLayout(horizontalLayout)
+            add_horizontal_line(self.injects_group, self.verticalLayout_5)
             i += 1
 
         # questions
-        self.line3 = QFrame(self.questions_group)
-        self.line3.setFrameShape(QFrame.HLine)
-        self.line3.setFrameShadow(QFrame.Sunken)
-        self.verticalLayout_6.addWidget(self.line3)
-
         i = 0
+        add_horizontal_line(self.questions_group, self.verticalLayout_6)
         for qaw in dict['qaw']:
-            self.horizontalLayout = QHBoxLayout()
-            self.question_label = QLabel(self.questions_group)
-            sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-            sizePolicy.setHorizontalStretch(0)
-            sizePolicy.setVerticalStretch(0)
-            sizePolicy.setHeightForWidth(self.question_label.sizePolicy().hasHeightForWidth())
-            self.question_label.setSizePolicy(sizePolicy)
-            self.question_label.setText(qaw[0])
-            self.question_label.setWordWrap(True)
-            self.send_question_button = QToolButton(self.questions_group)
-            self.send_question_button.setObjectName(f'send_question_button_{i}')
-            self.send_question_button.setText('Send')
-            self.horizontalLayout.addWidget(self.question_label)
-            self.horizontalLayout.addWidget(self.send_question_button)
-            self.verticalLayout_6.addLayout(self.horizontalLayout)
-            self.line = QFrame(self.questions_group)
-            self.line.setFrameShape(QFrame.HLine)
-            self.line.setFrameShadow(QFrame.Sunken)
-            self.verticalLayout_6.addWidget(self.line) 
+            horizontalLayout = QHBoxLayout()
+            add_label(self.questions_group, horizontalLayout, qaw[0], size_policy=True)
+            add_tool_button(self.questions_group, horizontalLayout, text='Send', object_name=f'send_question_button_{i}')
+            self.verticalLayout_6.addLayout(horizontalLayout)
+            add_horizontal_line(self.questions_group, self.verticalLayout_6)
+
+            # tab 3 questions
+            add_label(self.tab_3, self.verticalLayout_7, qaw[0], object_name=f'eval_question_label_{i}')
+            questions_answers_group = QGroupBox(self.tab_3)
+            questions_answers_group.setObjectName(f"questions_answers_group_{i}")
+            v_layout = QVBoxLayout(questions_answers_group)
+            self.verticalLayout_7.addWidget(questions_answers_group)
+
             i += 1
-        

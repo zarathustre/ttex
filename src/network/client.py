@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Signal, Slot
+from PySide6.QtCore import QObject, Signal
 
 import socket
 
@@ -9,6 +9,7 @@ class ClientSignals(QObject):
     scenario_signal = Signal(str)
     inject_signal = Signal(str)
     question_signal = Signal(str)
+    team_nick_signal = Signal(str)
 
 class Client():
     def __init__(self):
@@ -21,7 +22,8 @@ class Client():
 
     def shutdown_client(self):
         if self.client_connected:
-            self.client_socket.sendall('!DISC'.encode())
+            dc_msg = f'!DISC{self.nick}'
+            self.client_socket.sendall(dc_msg.encode())
         self.client_running = False
 
     def send(self, msg):
@@ -32,12 +34,20 @@ class Client():
             try:
                 msg = self.client_socket.recv(1024).decode()
 
-                if msg == '!DISCONNECT': print('Server disconnected'); break
-                if msg.startswith('!SCENARIO'): self.client_signals.scenario_signal.emit(f'{msg[9:]}')
-                if msg.startswith('!INJECT'): self.client_signals.inject_signal.emit(f'{msg[7:]}')
-                if msg.startswith('!QUESTION'): self.client_signals.question_signal.emit(f'{msg[9:]}')
-                if msg.startswith('!TIME') and msg[5] == '0': player_time_counter.display(0)
-                if msg.startswith('!TIME') and msg[5] != '0': player_time_counter.display((int(msg[5:]) // 60) + 1)
+                if msg == '!DISCONNECT': 
+                    print('Server disconnected'); break
+                if msg.startswith('!SCENARIO'): 
+                    self.client_signals.scenario_signal.emit(f'{msg[9:-1]}')
+                    self.client_signals.team_nick_signal.emit(f'{msg[-1]}')
+                    self.nick = msg[-1]
+                if msg.startswith('!INJECT'): 
+                    self.client_signals.inject_signal.emit(f'{msg[7:]}')
+                if msg.startswith('!QUESTION'): 
+                    self.client_signals.question_signal.emit(f'{msg[9:]}')
+                if msg.startswith('!TIME') and msg[5] == '0': 
+                    player_time_counter.display(0)
+                if msg.startswith('!TIME') and msg[5] != '0': 
+                    player_time_counter.display((int(msg[5:]) // 60) + 1)
                         
             except socket.timeout:
                 pass
@@ -45,4 +55,4 @@ class Client():
         print('Closing connection')
         self.client_connected = False
         self.client_socket.close()
-        
+     
