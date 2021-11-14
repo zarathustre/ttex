@@ -17,9 +17,7 @@ class Evaluator(QWidget, Ui_Evaluator):
         
 
     def init_widgets(self):
-        self.delete_button.setEnabled(False)
-        self.export_button.setEnabled(False)
-        self.start_button.setEnabled(False)
+        self.set_buttons_enabled(False)
         self.table_view_handler()
 
 
@@ -32,9 +30,13 @@ class Evaluator(QWidget, Ui_Evaluator):
     def on_selection_change(self):
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item:
-            self.delete_button.setEnabled(True)
-            self.export_button.setEnabled(True)
-            self.start_button.setEnabled(True)
+            self.set_buttons_enabled(True)
+
+
+    def set_buttons_enabled(self, condition):
+        self.delete_button.setEnabled(condition)
+        self.export_button.setEnabled(condition)
+        self.start_button.setEnabled(condition)
 
 
     def table_view_handler(self):
@@ -64,24 +66,21 @@ class Evaluator(QWidget, Ui_Evaluator):
         self.scenarios_tree.header().setSectionResizeMode(1, QHeaderView.Stretch)
         self.scenarios_tree.sortByColumn(2, Qt.DescendingOrder)
         self.scenarios_tree.setCurrentIndex(self.scenarios_tree.rootIndex())
-        # self.scenarios_tree.setCurrentIndex(self.items_model.index(0, 0, self.scenarios_tree.rootIndex()))  # select first row
 
 
     def get_all_scenarios(self):
         db = Database('scenes.db')
         q = "SELECT id, title, date FROM scenarios"
-        scenarios = db.query_db(q)
-        return scenarios
+        return db.query_db(q)
 
     
     def delete_selected_scenario(self):
-        db = Database('scenes.db')
-        q1 = "DELETE FROM qaw WHERE scenario = ?"
-        q2 = "DELETE FROM scenarios WHERE id = ?"
-        
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item: 
+            db = Database('scenes.db')
             id = self.items_model.itemFromIndex(selected_item[0]).data()
+            q1 = "DELETE FROM qaw WHERE scenario = ?"
+            q2 = "DELETE FROM scenarios WHERE id = ?"
             db.query_db(q1, [id])
             db.query_db(q2, [id])
             self.items_model.removeRow(selected_item[0].row()) 
@@ -90,8 +89,7 @@ class Evaluator(QWidget, Ui_Evaluator):
     def get_selected_id(self):
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item: 
-            id = self.items_model.itemFromIndex(selected_item[0]).data()
-            return id
+            return self.items_model.itemFromIndex(selected_item[0]).data()
 
         return None
 
@@ -109,7 +107,7 @@ class Evaluator(QWidget, Ui_Evaluator):
 
             qaw_r = db.query_db(qaw_q, [id])
 
-            result = {
+            return {
                 'id': scenarios_r[0],
                 'date': scenarios_r[-1],
                 'title': scenarios_r[1].capitalize(),
@@ -118,8 +116,6 @@ class Evaluator(QWidget, Ui_Evaluator):
                 'injects': injects,
                 'qaw': qaw_r 
             }
-
-            return result
 
         return None
 
@@ -130,11 +126,9 @@ class Evaluator(QWidget, Ui_Evaluator):
     def export_to_json(self):
         result = self.get_from_db()
         if result:
-            i = 0
-            for qaw in result['qaw']:
+            for i, qaw in enumerate(result['qaw']):
                 result['Question ' + str(i+1)] = '(Weight: ' + str(qaw[2]) + ') - ' + qaw[0]
                 result['Answer ' + str(i+1)] = qaw[1]
-                i += 1
 
             del result['qaw']
 

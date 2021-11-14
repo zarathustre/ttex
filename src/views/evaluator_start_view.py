@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QGroupBox, QVBoxLayout, QSlider
-from PySide6.QtCore import QObject, Signal, Slot, QTime, Qt
+from PySide6.QtCore import QObject, Signal, Slot, QTime
 
 from src.uic.evaluator_start import Ui_EvaluatorStart
 from src.network.server import Server
