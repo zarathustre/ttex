@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QFrame, QLabel, QSizePolicy, QToolButton, QSlider
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QFrame, QLabel, QSizePolicy, QToolButton, QWidget, QSpinBox
+from PySide6.QtCore import QRect
 
 def add_horizontal_line(parent, layout):
     line = QFrame(parent)
@@ -7,7 +7,7 @@ def add_horizontal_line(parent, layout):
     line.setFrameShadow(QFrame.Sunken)
     layout.addWidget(line)
 
-def add_label(parent, layout, text, size_policy=False, object_name=None, return_condition=False):
+def add_label(parent, layout, text, size_policy=False, object_name=None):
     label = QLabel(parent)
     if size_policy: 
         add_size_policy(label)
@@ -16,8 +16,6 @@ def add_label(parent, layout, text, size_policy=False, object_name=None, return_
     label.setText(text)
     label.setWordWrap(True)
     layout.addWidget(label)
-    if return_condition:
-        return label
 
 def add_size_policy(widget):
     sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -35,15 +33,29 @@ def add_tool_button(parent, layout, text, object_name=None, connection=None):
     button.setText(text)
     layout.addWidget(button)
 
-def add_horizontal_slider(parent, layout, object_name=None, return_condition=False):
-    slider = QSlider(parent)
-    slider.setOrientation(Qt.Horizontal)
-    slider.setFixedWidth(100)
-    slider.setMinimum(1)
-    slider.setMaximum(10)
-    slider.setSingleStep(1)
+def add_tool_box_page(parent, title, object_name):
+    page = QWidget()
+    page.setObjectName(object_name)
+    page.setGeometry(QRect(0, 0, 738, 350))
+    parent.addItem(page, title)
+
+def add_spin_box(parent, layout, object_name=None):
+    spin_box = QSpinBox(parent)
+    spin_box.setMaximum(10)
     if object_name:
-        slider.setObjectName(object_name)
-    layout.addWidget(slider)
-    if return_condition:
-        return slider
+        spin_box.setObjectName(object_name)
+    layout.addWidget(spin_box)
+
+
+# def add_horizontal_slider(parent, layout, object_name=None, return_condition=False):
+#     slider = QSlider(parent)
+#     slider.setOrientation(Qt.Horizontal)
+#     slider.setFixedWidth(100)
+#     slider.setMinimum(1)
+#     slider.setMaximum(10)
+#     slider.setSingleStep(1)
+#     if object_name:
+#         slider.setObjectName(object_name)
+#     layout.addWidget(slider)
+#     if return_condition:
+#         return slider
