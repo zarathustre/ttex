@@ -48,16 +48,16 @@ class Server():
                 if client:
                     nick = self.assign_nickname()
                     client.sendall(f'{msg}{nick}'.encode())                # scenario text
-                    print(f'Connection from {str(address)}')
+                    print(f'Connection from {address}')
                     self.clients.append(client)
                     self.server_signal.server_signal.emit(len(self.clients))
 
                     receive_dc_thread = threading.Thread(target=self.receive_message, args=(client, ), daemon=True)
                     receive_dc_thread.start()
-               
+
             except socket.timeout:
                 pass
-                
+
         print('Server shutting down')
         self.server_socket.close()
 

@@ -1,9 +1,9 @@
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QGroupBox, QVBoxLayout, QSlider
-from PySide6.QtCore import QObject, Signal, Slot, QTime, Qt
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QToolButton, QVBoxLayout, QToolBox, QSpinBox
+from PySide6.QtCore import QObject, Signal, Slot, QTime
 
 from src.uic.evaluator_start import Ui_EvaluatorStart
 from src.network.server import Server
-from src.common_tools import add_horizontal_line, add_label, add_tool_button, add_horizontal_slider
+from src.common_tools import add_horizontal_line, add_label, add_tool_button, add_tool_box_page, add_spin_box
 
 import time
 import threading
@@ -31,6 +31,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
     
     def assign_widgets(self):
         self.start_timer_button.clicked.connect(lambda: self.start_timer_thread())
+        self.final_score_button.clicked.connect(self.init_final_score)
 
 
     def init_connection(self, values):
@@ -56,9 +57,40 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             i = int(button.objectName()[-1])
             button.clicked.connect(partial(self.server.send_to_all, f'!QUESTION{questions[i]}'))
 
-    # TODO
-    # - Handle the evaluation and scoring of the received answers
-    # - Disable send buttons after submission
+
+    def init_answers_tool_box(self):
+        self.answers_tool_box = QToolBox(self.tab_3)
+        self.answers_tool_box.setObjectName(u"answers_tool_box")
+        self.verticalLayout_7.addWidget(self.answers_tool_box)
+        self.init_template_answers_page('Template Answers', 'template_answers_page')
+        self.init_team_page('Team 0', 'page_team_')
+
+
+    def init_template_answers_page(self, title, object_name):
+        add_tool_box_page(self.answers_tool_box, title, object_name)
+        page = self.answers_tool_box.findChild(QWidget, object_name)
+        v_layout = QVBoxLayout(page)
+        questions = [label.text() for label in self.questions_group.findChildren(QLabel)]
+        for i, question in enumerate(questions):
+            add_label(page, v_layout, question)
+            add_label(page, v_layout, self.template_answers[i])
+            add_label(page, v_layout, f'Weight: {self.weights[i]}')
+            add_horizontal_line(page, v_layout)
+
+
+    def init_team_page(self, title, object_name):
+        add_tool_box_page(self.answers_tool_box, title, object_name)
+        page = self.answers_tool_box.findChild(QWidget, object_name)
+        v_layout = QVBoxLayout(page)
+        questions = [label.text() for label in self.questions_group.findChildren(QLabel)]
+        for i, q in enumerate(questions):
+            add_label(page, v_layout, q, object_name=f'question_label_{i}')
+            h_layout = QHBoxLayout()
+            v_layout.addLayout(h_layout)
+            add_label(page, h_layout, '', size_policy=True, object_name=f'answer_label_{i}')
+            add_spin_box(page, h_layout)
+            add_horizontal_line(page, v_layout)
+
 
     @Slot(str)
     def receive_answer(self, msg):
@@ -70,21 +102,41 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
 
     
     def update_answer_tab(self, nick, question, answer):
-        for label in self.tab_3.findChildren(QLabel):
+
+        default_page = self.answers_tool_box.findChild(QWidget, 'page_team_')
+        if default_page:
+            default_page.setObjectName(f'page_team_{nick}')
+            self.answers_tool_box.setItemText(1, f'Team {nick}')
+
+        team_page = self.answers_tool_box.findChild(QWidget, f'page_team_{nick}')
+        
+        if not team_page:
+            self.init_team_page(f'Team {nick}', f'page_team_{nick}')
+            team_page = self.answers_tool_box.findChild(QWidget, f'page_team_{nick}')
+            
+        for label in team_page.findChildren(QLabel):
             if label.text() == question:
                 index = label.objectName()[-1]
 
-        for group in self.tab_3.findChildren(QGroupBox):
-            if group.objectName()[-1] == index:
-                h_layout = QHBoxLayout()
-                add_label(group, h_layout, f'Team {nick}: {answer}', size_policy=True)
-                slider = add_horizontal_slider(group, h_layout, return_condition=True)
-                label = add_label(group, h_layout, '1', object_name=f'score_label_{index}_{nick}', return_condition=True)
-                slider.valueChanged.connect(lambda: label.setText(str(slider.value())))
-                v_layout = group.findChildren(QVBoxLayout)[0]
-                v_layout.addLayout(h_layout)
-                add_horizontal_line(group, v_layout)
+        answer_label = team_page.findChild(QLabel, f'answer_label_{index}')
+        answer_label.setText(answer)
 
+
+    def init_final_score(self):
+        for team, score in self.calculate_final_score().items():
+            self.formLayout.addRow(QLabel(f'Team {team}:'), QLabel(f'{score}'))
+
+
+    def calculate_final_score(self):
+        team_scores = {}
+        for team in self.answers_tool_box.findChildren(QWidget):
+            if team.objectName().startswith('page_team_'):
+                scores = [spinBox.value() for spinBox in team.findChildren(QSpinBox)]
+                team_score = sum(scores[i] * self.weights[i] for i in range(len(scores)))
+                team_scores[team.objectName()[-1]] = str(team_score)
+
+        return team_scores
+        
         
     @Slot(int)
     def set_lobby_counter(self, logged_in):
@@ -168,18 +220,14 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         # questions
         i = 0
         add_horizontal_line(self.questions_group, self.verticalLayout_6)
+        self.weights = []
+        self.template_answers = []
         for qaw in dict['qaw']:
             horizontalLayout = QHBoxLayout()
             add_label(self.questions_group, horizontalLayout, qaw[0], size_policy=True)
             add_tool_button(self.questions_group, horizontalLayout, text='Send', object_name=f'send_question_button_{i}')
             self.verticalLayout_6.addLayout(horizontalLayout)
             add_horizontal_line(self.questions_group, self.verticalLayout_6)
-
-            # tab 3 questions
-            add_label(self.tab_3, self.verticalLayout_7, qaw[0], object_name=f'eval_question_label_{i}')
-            questions_answers_group = QGroupBox(self.tab_3)
-            questions_answers_group.setObjectName(f"questions_answers_group_{i}")
-            v_layout = QVBoxLayout(questions_answers_group)
-            self.verticalLayout_7.addWidget(questions_answers_group)
-
             i += 1
+            self.weights.append(qaw[2])
+            self.template_answers.append(qaw[1])

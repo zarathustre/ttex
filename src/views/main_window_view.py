@@ -67,6 +67,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.start_evaluator_scenario_obj.init_connection(values)
             self.start_evaluator_scenario_obj.server_thread.start()
             self.start_evaluator_scenario_obj.assign_connection_widgets(values)
+            self.start_evaluator_scenario_obj.init_answers_tool_box()
 
     def terminate_evaluator(self):
         self.start_evaluator_scenario_obj.server.shutdown_server()

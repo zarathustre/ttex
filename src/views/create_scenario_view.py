@@ -145,31 +145,11 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
     def get_values(self):
         title = self.title_edit.text()
         scenario = self.scenario_edit.toPlainText()
-
-        # Objectives
-        objectives = []
-        for obj in self.objectives_group.findChildren(QTextEdit):
-            objectives.append(obj.toPlainText())
-
-        # Injects
-        injects = []
-        for inj in self.injects_group.findChildren(QTextEdit):
-            injects.append(inj.toPlainText())
-
-        # Questions
-        questions = []
-        for ques in self.questions_group.findChildren(QTextEdit):
-            questions.append(ques.toPlainText())
-
-        # Weights
-        weights = []
-        for weight in self.questions_group.findChildren(QComboBox):
-            weights.append(int(weight.currentText()))
-
-        # Answers
-        answers = []
-        for answ  in self.answers_group.findChildren(QTextEdit):
-            answers.append(answ.toPlainText())
+        objectives = [obj.toPlainText() for obj in self.objectives_group.findChildren(QTextEdit)]
+        injects = [inj.toPlainText() for inj in self.injects_group.findChildren(QTextEdit)]
+        questions = [ques.toPlainText() for ques in self.questions_group.findChildren(QTextEdit)]
+        weights = [int(weight.currentText()) for weight in self.questions_group.findChildren(QComboBox)]
+        answers = [answ.toPlainText() for answ in self.answers_group.findChildren(QTextEdit)]
 
         return [title, scenario, objectives, injects, questions, answers, weights]
 
@@ -184,14 +164,12 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         get_title = "SELECT title FROM scenarios WHERE title = ?"
         title = db.query_db(get_title, [data[0]]) 
 
-        empty = False           # this variable is true if any text field is empty
+        # condition True if there's any empty field
         for i in range(2,6):
-            for item in data[i]:
-                if item == "":
-                    empty = True        
+            any_empty_field = any(item == "" for item in data[i])        
 
         # if there are empty fields
-        if data[0] == "" or data[1] == "" or empty:
+        if data[0] == "" or data[1] == "" or any_empty_field:
             QMessageBox.warning(self, "Warning", "All fields must be filled !", QMessageBox.Ok)
         # if question and answer fields are not equal
         elif len(data[4]) != len(data[5]):
