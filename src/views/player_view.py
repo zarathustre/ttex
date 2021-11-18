@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit, QToolButton
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QTextEdit, QToolButton, QMessageBox, QLabel
 from PySide6.QtCore import Slot
 
 from src.uic.player import Ui_Player
@@ -40,21 +40,32 @@ class Player(QWidget, Ui_Player):
 
     @Slot(str)
     def set_inject(self, text):
-        add_label(self.player_injects_group, self.verticalLayout_4, text)
-        add_horizontal_line(self.player_injects_group, self.verticalLayout_4)
+        injects = (label.text() for label in self.player_injects_group.findChildren(QLabel))
+        if text not in injects:
+            add_label(self.player_injects_group, self.verticalLayout_4, text)
+            add_horizontal_line(self.player_injects_group, self.verticalLayout_4)
 
     @Slot(str)
     def set_question(self, question_text):
-        count = len(self.player_questions_group.findChildren(QToolButton))
-        add_label(self.player_questions_group, self.verticalLayout_5, question_text, object_name=f'question_label_{count}')
-        self.horizontalLayout = QHBoxLayout()
-        self.answer_text_edit = QTextEdit(self.player_questions_group)
-        self.horizontalLayout.addWidget(self.answer_text_edit)
-        add_tool_button(self.player_questions_group, self.horizontalLayout, text='Submit', \
-            connection=partial(self.send_answer_to_evaluator, question_text, self.answer_text_edit))
+        questions = (label.text() for label in self.player_questions_group.findChildren(QLabel))
+        if question_text not in questions:
+            count = len(self.player_questions_group.findChildren(QToolButton))
+            add_label(self.player_questions_group, self.verticalLayout_5, question_text, object_name=f'question_label_{count}')
+            self.horizontalLayout = QHBoxLayout()
+            answer_text_edit = QTextEdit(self.player_questions_group)
+            self.horizontalLayout.addWidget(answer_text_edit)
+            send_button = add_tool_button(self.player_questions_group, self.horizontalLayout, text='Submit', return_value=True)
+            send_button.clicked.connect(partial(self.send_answer_to_evaluator, question_text, answer_text_edit, send_button))
+            self.verticalLayout_5.addLayout(self.horizontalLayout)
 
-        self.verticalLayout_5.addLayout(self.horizontalLayout)
 
-
-    def send_answer_to_evaluator(self, question, answer_text_edit):
-        self.client.send(f'!ANSWER{self.team_nick_label.text()[-1]}{question}!A!{answer_text_edit.toPlainText()}')
+    def send_answer_to_evaluator(self, question, answer_text_edit, send_button):
+        if answer_text_edit.toPlainText() == '':
+            QMessageBox.warning(self, "Warning", "Empty field", QMessageBox.Ok)
+        else:
+            msg_box = QMessageBox.information(self, "Confirmation", "Are you sure you want to submit your answer ?", QMessageBox.Yes, QMessageBox.No)
+            if msg_box == QMessageBox.Yes:
+                self.client.send(f'!ANSWER{self.team_nick_label.text()[-1]}{question}!A!{answer_text_edit.toPlainText()}')
+                answer_text_edit.clear()
+                answer_text_edit.setReadOnly(True)
+                send_button.setEnabled(False)

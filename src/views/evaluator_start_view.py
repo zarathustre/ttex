@@ -31,6 +31,7 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
     
     def assign_widgets(self):
         self.start_timer_button.clicked.connect(lambda: self.start_timer_thread())
+        self.final_score_button.clicked.connect(self.init_final_score)
 
 
     def init_connection(self, values):
@@ -61,10 +62,23 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         self.answers_tool_box = QToolBox(self.tab_3)
         self.answers_tool_box.setObjectName(u"answers_tool_box")
         self.verticalLayout_7.addWidget(self.answers_tool_box)
-        self.init_page('Team 0', 'page_team_')
+        self.init_template_answers_page('Template Answers', 'template_answers_page')
+        self.init_team_page('Team 0', 'page_team_')
 
 
-    def init_page(self, title, object_name):
+    def init_template_answers_page(self, title, object_name):
+        add_tool_box_page(self.answers_tool_box, title, object_name)
+        page = self.answers_tool_box.findChild(QWidget, object_name)
+        v_layout = QVBoxLayout(page)
+        questions = [label.text() for label in self.questions_group.findChildren(QLabel)]
+        for i, question in enumerate(questions):
+            add_label(page, v_layout, question)
+            add_label(page, v_layout, self.template_answers[i])
+            add_label(page, v_layout, f'Weight: {self.weights[i]}')
+            add_horizontal_line(page, v_layout)
+
+
+    def init_team_page(self, title, object_name):
         add_tool_box_page(self.answers_tool_box, title, object_name)
         page = self.answers_tool_box.findChild(QWidget, object_name)
         v_layout = QVBoxLayout(page)
@@ -77,10 +91,6 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             add_spin_box(page, h_layout)
             add_horizontal_line(page, v_layout)
 
-
-    # TODO
-    # - Handle the evaluation and scoring of the received answers
-    # - Disable send buttons after submission
 
     @Slot(str)
     def receive_answer(self, msg):
@@ -96,12 +106,12 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         default_page = self.answers_tool_box.findChild(QWidget, 'page_team_')
         if default_page:
             default_page.setObjectName(f'page_team_{nick}')
-            self.answers_tool_box.setItemText(0, f'Team {nick}')
+            self.answers_tool_box.setItemText(1, f'Team {nick}')
 
         team_page = self.answers_tool_box.findChild(QWidget, f'page_team_{nick}')
         
         if not team_page:
-            self.init_page(f'Team {nick}', f'page_team_{nick}')
+            self.init_team_page(f'Team {nick}', f'page_team_{nick}')
             team_page = self.answers_tool_box.findChild(QWidget, f'page_team_{nick}')
             
         for label in team_page.findChildren(QLabel):
@@ -111,6 +121,22 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         answer_label = team_page.findChild(QLabel, f'answer_label_{index}')
         answer_label.setText(answer)
 
+
+    def init_final_score(self):
+        for team, score in self.calculate_final_score().items():
+            self.formLayout.addRow(QLabel(f'Team {team}:'), QLabel(f'{score}'))
+
+
+    def calculate_final_score(self):
+        team_scores = {}
+        for team in self.answers_tool_box.findChildren(QWidget):
+            if team.objectName().startswith('page_team_'):
+                scores = [spinBox.value() for spinBox in team.findChildren(QSpinBox)]
+                team_score = sum(scores[i] * self.weights[i] for i in range(len(scores)))
+                team_scores[team.objectName()[-1]] = str(team_score)
+
+        return team_scores
+        
         
     @Slot(int)
     def set_lobby_counter(self, logged_in):
@@ -194,6 +220,8 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
         # questions
         i = 0
         add_horizontal_line(self.questions_group, self.verticalLayout_6)
+        self.weights = []
+        self.template_answers = []
         for qaw in dict['qaw']:
             horizontalLayout = QHBoxLayout()
             add_label(self.questions_group, horizontalLayout, qaw[0], size_policy=True)
@@ -201,3 +229,5 @@ class EvaluatorStart(QWidget, Ui_EvaluatorStart):
             self.verticalLayout_6.addLayout(horizontalLayout)
             add_horizontal_line(self.questions_group, self.verticalLayout_6)
             i += 1
+            self.weights.append(qaw[2])
+            self.template_answers.append(qaw[1])

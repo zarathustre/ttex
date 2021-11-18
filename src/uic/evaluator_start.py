@@ -130,6 +130,46 @@ class Ui_EvaluatorStart(object):
         self.verticalLayout_7 = QVBoxLayout(self.tab_3)
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.evaluator_start_tab.addTab(self.tab_3, "")
+        self.tab_4 = QWidget()
+        self.tab_4.setObjectName(u"tab_4")
+        self.horizontalLayout_4 = QHBoxLayout(self.tab_4)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_7)
+
+        self.final_score_button = QPushButton(self.tab_4)
+        self.final_score_button.setObjectName(u"final_score_button")
+
+        self.horizontalLayout_4.addWidget(self.final_score_button)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
+
+        self.verticalLayout_8 = QVBoxLayout()
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.score_title_label = QLabel(self.tab_4)
+        self.score_title_label.setObjectName(u"score_title_label")
+        self.score_title_label.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_8.addWidget(self.score_title_label)
+
+        self.formLayout = QFormLayout()
+        self.formLayout.setObjectName(u"formLayout")
+        self.formLayout.setLabelAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.formLayout.setFormAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+
+        self.verticalLayout_8.addLayout(self.formLayout)
+
+
+        self.horizontalLayout_4.addLayout(self.verticalLayout_8)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_6)
+
+        self.evaluator_start_tab.addTab(self.tab_4, "")
 
         self.verticalLayout.addWidget(self.evaluator_start_tab)
 
@@ -144,7 +184,7 @@ class Ui_EvaluatorStart(object):
 
         self.retranslateUi(EvaluatorStart)
 
-        self.evaluator_start_tab.setCurrentIndex(2)
+        self.evaluator_start_tab.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(EvaluatorStart)
@@ -161,6 +201,9 @@ class Ui_EvaluatorStart(object):
         self.questions_group.setTitle(QCoreApplication.translate("EvaluatorStart", u"Questions", None))
         self.evaluator_start_tab.setTabText(self.evaluator_start_tab.indexOf(self.tab_2), QCoreApplication.translate("EvaluatorStart", u"Tab 2", None))
         self.evaluator_start_tab.setTabText(self.evaluator_start_tab.indexOf(self.tab_3), QCoreApplication.translate("EvaluatorStart", u"Tab 3", None))
+        self.final_score_button.setText(QCoreApplication.translate("EvaluatorStart", u"Final Score", None))
+        self.score_title_label.setText(QCoreApplication.translate("EvaluatorStart", u"Scores", None))
+        self.evaluator_start_tab.setTabText(self.evaluator_start_tab.indexOf(self.tab_4), QCoreApplication.translate("EvaluatorStart", u"Tab 4", None))
         self.time_bar.setFormat(QCoreApplication.translate("EvaluatorStart", u"%p%", None))
     # retranslateUi
 

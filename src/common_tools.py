@@ -24,7 +24,7 @@ def add_size_policy(widget):
     sizePolicy.setHeightForWidth(widget.sizePolicy().hasHeightForWidth())
     widget.setSizePolicy(sizePolicy)
 
-def add_tool_button(parent, layout, text, object_name=None, connection=None):
+def add_tool_button(parent, layout, text, object_name=None, connection=None, return_value=False):
     button = QToolButton(parent)
     if object_name:
         button.setObjectName(object_name)
@@ -32,6 +32,8 @@ def add_tool_button(parent, layout, text, object_name=None, connection=None):
         button.clicked.connect(connection)
     button.setText(text)
     layout.addWidget(button)
+    if return_value:
+        return button
 
 def add_tool_box_page(parent, title, object_name):
     page = QWidget()
@@ -41,6 +43,7 @@ def add_tool_box_page(parent, title, object_name):
 
 def add_spin_box(parent, layout, object_name=None):
     spin_box = QSpinBox(parent)
+    spin_box.setMinimum(1)
     spin_box.setMaximum(10)
     if object_name:
         spin_box.setObjectName(object_name)
