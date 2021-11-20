@@ -18,7 +18,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
     def closeEvent(self, event):
-        if hasattr(self, 'start_evaluator_scenario_obj'): 
+        if hasattr(self, 'start_evaluator_scenario_obj'):
+            self.start_evaluator_scenario_obj.stop_timer() 
             self.start_evaluator_scenario_obj.server.shutdown_server()
         elif hasattr(self, 'player'): 
             self.player.client.shutdown_client()
@@ -70,8 +71,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.start_evaluator_scenario_obj.init_answers_tool_box()
 
     def terminate_evaluator(self):
+        self.start_evaluator_scenario_obj.stop_timer()
         self.start_evaluator_scenario_obj.server.shutdown_server()
-        self.start_evaluator_scenario_obj.set_timer_false()
         self.delete_objects_and_go_back(self.start_evaluator_scenario_obj, self.evaluator_obj, self.start_scenario_obj)
 
     def create_player(self):

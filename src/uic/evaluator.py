@@ -77,10 +77,28 @@ class Ui_Evaluator(object):
 
     def retranslateUi(self, Evaluator):
         Evaluator.setWindowTitle(QCoreApplication.translate("Evaluator", u"Form", None))
+#if QT_CONFIG(statustip)
+        self.create_from_start_button.setStatusTip(QCoreApplication.translate("Evaluator", u"Create new scenario", None))
+#endif // QT_CONFIG(statustip)
         self.create_from_start_button.setText(QCoreApplication.translate("Evaluator", u"+", None))
+#if QT_CONFIG(statustip)
+        self.scenarios_tree.setStatusTip(QCoreApplication.translate("Evaluator", u"Scenarios in the database", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(statustip)
+        self.delete_button.setStatusTip(QCoreApplication.translate("Evaluator", u"Delete selected entry", None))
+#endif // QT_CONFIG(statustip)
         self.delete_button.setText(QCoreApplication.translate("Evaluator", u"Delete", None))
+#if QT_CONFIG(statustip)
+        self.import_button.setStatusTip(QCoreApplication.translate("Evaluator", u"Import scenario from file", None))
+#endif // QT_CONFIG(statustip)
         self.import_button.setText(QCoreApplication.translate("Evaluator", u"Import", None))
+#if QT_CONFIG(statustip)
+        self.export_button.setStatusTip(QCoreApplication.translate("Evaluator", u"Export selected scenario to file", None))
+#endif // QT_CONFIG(statustip)
         self.export_button.setText(QCoreApplication.translate("Evaluator", u"Export", None))
+#if QT_CONFIG(statustip)
+        self.start_button.setStatusTip(QCoreApplication.translate("Evaluator", u"Launch selected scenario", None))
+#endif // QT_CONFIG(statustip)
         self.start_button.setText(QCoreApplication.translate("Evaluator", u"Start", None))
     # retranslateUi
 

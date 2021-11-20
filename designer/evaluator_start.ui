@@ -32,7 +32,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLCDNumber" name="time_counter"/>
+      <widget class="QLCDNumber" name="time_counter">
+       <property name="statusTip">
+        <string>Remaining time</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_4">
@@ -49,6 +53,9 @@
      </item>
      <item>
       <widget class="QLCDNumber" name="lobby_counter">
+       <property name="statusTip">
+        <string>Connected players</string>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Box</enum>
        </property>
@@ -59,11 +66,11 @@
    <item>
     <widget class="QTabWidget" name="evaluator_start_tab">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
-       <string>Tab 1</string>
+       <string>Scenario</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
@@ -107,10 +114,17 @@
         </layout>
        </item>
        <item>
-        <widget class="QTextBrowser" name="scenario_text"/>
+        <widget class="QTextBrowser" name="scenario_text">
+         <property name="statusTip">
+          <string>Scenario</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QGroupBox" name="objectives_group">
+         <property name="statusTip">
+          <string>Objectives</string>
+         </property>
          <property name="title">
           <string>Objectives</string>
          </property>
@@ -124,10 +138,17 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QTimeEdit" name="time_edit"/>
+          <widget class="QTimeEdit" name="time_edit">
+           <property name="statusTip">
+            <string>Timer</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="start_timer_button">
+           <property name="statusTip">
+            <string>Start timer</string>
+           </property>
            <property name="text">
             <string>Start Timer</string>
            </property>
@@ -148,6 +169,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="terminate_button">
+           <property name="statusTip">
+            <string>Terminate session (all players will be disconnected)</string>
+           </property>
            <property name="text">
             <string>Terminate</string>
            </property>
@@ -159,7 +183,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Injects / Objectives</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
@@ -167,6 +191,9 @@
        </property>
        <item>
         <widget class="QGroupBox" name="injects_group">
+         <property name="statusTip">
+          <string>Injects</string>
+         </property>
          <property name="title">
           <string>Injects</string>
          </property>
@@ -175,6 +202,9 @@
        </item>
        <item>
         <widget class="QGroupBox" name="questions_group">
+         <property name="statusTip">
+          <string>Questions</string>
+         </property>
          <property name="title">
           <string>Questions</string>
          </property>
@@ -185,13 +215,13 @@
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>Tab 3</string>
+       <string>Answers</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7"/>
      </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
-       <string>Tab 4</string>
+       <string>Evaluation</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
@@ -209,6 +239,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="final_score_button">
+         <property name="statusTip">
+          <string>Calculate final score</string>
+         </property>
          <property name="text">
           <string>Final Score</string>
          </property>
@@ -270,6 +303,9 @@
    </item>
    <item>
     <widget class="QProgressBar" name="time_bar">
+     <property name="statusTip">
+      <string>Remaining time</string>
+     </property>
      <property name="maximum">
       <number>0</number>
      </property>

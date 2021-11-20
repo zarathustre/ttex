@@ -37,10 +37,12 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
         next = self.next_button
         if tab.currentWidget().objectName() == 'tab_3':         # last tab
             next.setText("Save")
+            self.next_button.setStatusTip('Save scenario in the database')
             next.clicked.disconnect()
             next.clicked.connect(lambda: save_and_back())       # next button becomes save button to save entries in database
         else:
             next.setText("Next")
+            self.next_button.setStatusTip('Go to next tab')
             next.clicked.disconnect()
             next.clicked.connect(lambda: tab.setCurrentIndex(tab.currentIndex() + 1))   # next button changes tab to the next one
 
