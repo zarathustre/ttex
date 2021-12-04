@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QHeaderView
+from PySide6.QtWidgets import QWidget, QHeaderView, QFileDialog
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtCore import Qt
 
@@ -15,29 +15,25 @@ class Evaluator(QWidget, Ui_Evaluator):
         self.init_widgets()
         self.assign_widgets()
         
-
     def init_widgets(self):
         self.set_buttons_enabled(False)
         self.table_view_handler()
 
-
     def assign_widgets(self):
-        self.scenarios_tree.selectionModel().selectionChanged.connect(lambda: self.on_selection_change())
-        self.delete_button.clicked.connect(lambda: self.delete_selected_scenario())
-        self.export_button.clicked.connect(lambda: self.export_to_json())
-
+        self.scenarios_tree.selectionModel().selectionChanged.connect(self.on_selection_change)
+        self.delete_button.clicked.connect(self.delete_selected_scenario)
+        self.export_button.clicked.connect(self.export_to_json)
+        self.import_button.clicked.connect(self.import_from_json)
 
     def on_selection_change(self):
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item:
             self.set_buttons_enabled(True)
 
-
     def set_buttons_enabled(self, condition):
         self.delete_button.setEnabled(condition)
         self.export_button.setEnabled(condition)
         self.start_button.setEnabled(condition)
-
 
     def table_view_handler(self):
         scenarios = self.get_all_scenarios()
@@ -67,13 +63,11 @@ class Evaluator(QWidget, Ui_Evaluator):
         self.scenarios_tree.sortByColumn(2, Qt.DescendingOrder)
         self.scenarios_tree.setCurrentIndex(self.scenarios_tree.rootIndex())
 
-
     def get_all_scenarios(self):
         db = Database('scenes.db')
         q = "SELECT id, title, date FROM scenarios"
         return db.query_db(q)
 
-    
     def delete_selected_scenario(self):
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item: 
@@ -85,14 +79,12 @@ class Evaluator(QWidget, Ui_Evaluator):
             db.query_db(q2, [id])
             self.items_model.removeRow(selected_item[0].row()) 
 
-
     def get_selected_id(self):
         selected_item = self.scenarios_tree.selectionModel().selectedRows()
         if selected_item: 
             return self.items_model.itemFromIndex(selected_item[0]).data()
 
         return None
-
 
     def get_from_db(self):
         id = self.get_selected_id()
@@ -119,12 +111,9 @@ class Evaluator(QWidget, Ui_Evaluator):
 
         return None
 
-
-    # TODO file chooser + set file name to scenario title
-    # TODO export to txt, import from file
-    # TODO capitalize keys
     def export_to_json(self):
         result = self.get_from_db()
+
         if result:
             for i, qaw in enumerate(result['qaw']):
                 result['Question ' + str(i+1)] = '(Weight: ' + str(qaw[2]) + ') - ' + qaw[0]
@@ -132,6 +121,18 @@ class Evaluator(QWidget, Ui_Evaluator):
 
             del result['qaw']
 
-            with open('export.json', 'w') as f:
+            folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
+            file_path = folder_path + f"/{result['title']}.json"
+
+            result = {k.capitalize(): v for k,v in result.items()}
+
+            with open(file_path, 'w') as f:
                 json.dump(result, f, indent=4)
-            
+
+    def import_from_json(self):
+        file_path = QFileDialog.getOpenFileName(self, 'Select File', filter='*.json')
+        
+        with open(file_path[0], 'r') as f:
+            data = json.load(f)
+
+        print(data)

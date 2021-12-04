@@ -26,6 +26,7 @@ class Ui_EvaluatorStart(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.time_counter = QLCDNumber(EvaluatorStart)
         self.time_counter.setObjectName(u"time_counter")
+        self.time_counter.setStyleSheet(u"")
 
         self.horizontalLayout.addWidget(self.time_counter)
 
@@ -35,7 +36,15 @@ class Ui_EvaluatorStart(object):
 
         self.lobby_counter = QLCDNumber(EvaluatorStart)
         self.lobby_counter.setObjectName(u"lobby_counter")
+        font = QFont()
+        font.setBold(False)
+        font.setKerning(True)
+        self.lobby_counter.setFont(font)
+        self.lobby_counter.setAutoFillBackground(False)
+        self.lobby_counter.setStyleSheet(u"")
         self.lobby_counter.setFrameShape(QFrame.Box)
+        self.lobby_counter.setFrameShadow(QFrame.Raised)
+        self.lobby_counter.setMidLineWidth(0)
 
         self.horizontalLayout.addWidget(self.lobby_counter)
 
@@ -184,7 +193,7 @@ class Ui_EvaluatorStart(object):
 
         self.retranslateUi(EvaluatorStart)
 
-        self.evaluator_start_tab.setCurrentIndex(0)
+        self.evaluator_start_tab.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(EvaluatorStart)

@@ -36,6 +36,9 @@
        <property name="statusTip">
         <string>Remaining time</string>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
       </widget>
      </item>
      <item>
@@ -53,11 +56,29 @@
      </item>
      <item>
       <widget class="QLCDNumber" name="lobby_counter">
+       <property name="font">
+        <font>
+         <bold>false</bold>
+         <kerning>true</kerning>
+        </font>
+       </property>
        <property name="statusTip">
         <string>Connected players</string>
        </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="frameShape">
         <enum>QFrame::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="midLineWidth">
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -66,7 +87,7 @@
    <item>
     <widget class="QTabWidget" name="evaluator_start_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
