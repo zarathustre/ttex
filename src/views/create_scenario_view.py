@@ -34,15 +34,17 @@ class CreateScenario(QWidget, Ui_create_scenario_page):
     # Handles the tab change in the create scenario page - On last tab, change next button to save button
     def on_tab_change(self, save_and_back):
         tab = self.create_scenario_tab
-        next = self.next_button
-        if tab.currentWidget().objectName() == 'tab_3':         # last tab
-            next.setText("Save")
-            next.clicked.disconnect()
-            next.clicked.connect(lambda: save_and_back())       # next button becomes save button to save entries in database
+        if tab.currentWidget().objectName() == 'tab_3':
+            self.set_next_or_save_button(self.next_button, 'Save', 'Save scenario in the database', lambda: save_and_back())
         else:
-            next.setText("Next")
-            next.clicked.disconnect()
-            next.clicked.connect(lambda: tab.setCurrentIndex(tab.currentIndex() + 1))   # next button changes tab to the next one
+            self.set_next_or_save_button(self.next_button, 'Next', 'Go to next tab', \
+                lambda: tab.setCurrentIndex(tab.currentIndex() + 1))
+
+    def set_next_or_save_button(next_button, text, status_tip, connection):
+        next_button.setText(text)
+        next_button.setStatusTip(status_tip)
+        next_button.disconnect()
+        next_button.clicked.connect(connection)
 
     # Clear the input fields of the current tab
     def clear_text(self):

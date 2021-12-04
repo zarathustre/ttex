@@ -94,8 +94,17 @@ class Ui_StartScenario(object):
 
     def retranslateUi(self, StartScenario):
         StartScenario.setWindowTitle(QCoreApplication.translate("StartScenario", u"Form", None))
+#if QT_CONFIG(statustip)
+        self.back_button.setStatusTip(QCoreApplication.translate("StartScenario", u"Go back", None))
+#endif // QT_CONFIG(statustip)
         self.back_button.setText(QCoreApplication.translate("StartScenario", u"Back", None))
+#if QT_CONFIG(statustip)
+        self.player_button.setStatusTip(QCoreApplication.translate("StartScenario", u"Launch a player session (there must be at least 1 evaluator before you can join)", None))
+#endif // QT_CONFIG(statustip)
         self.player_button.setText(QCoreApplication.translate("StartScenario", u"Player", None))
+#if QT_CONFIG(statustip)
+        self.evaluator_button.setStatusTip(QCoreApplication.translate("StartScenario", u"Launch an evaluator session to host a scenario (players can then join this room to participate)", None))
+#endif // QT_CONFIG(statustip)
         self.evaluator_button.setText(QCoreApplication.translate("StartScenario", u"Evaluator", None))
         self.label.setText(QCoreApplication.translate("StartScenario", u"Pick your role", None))
     # retranslateUi

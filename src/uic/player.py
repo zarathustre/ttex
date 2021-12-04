@@ -87,7 +87,7 @@ class Ui_Player(object):
 
         self.retranslateUi(Player)
 
-        self.player_tab.setCurrentIndex(0)
+        self.player_tab.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(Player)
@@ -95,11 +95,23 @@ class Ui_Player(object):
 
     def retranslateUi(self, Player):
         Player.setWindowTitle(QCoreApplication.translate("Player", u"Form", None))
+#if QT_CONFIG(statustip)
+        self.player_terminate_button.setStatusTip(QCoreApplication.translate("Player", u"Terminate the session (all entries will be lost)", None))
+#endif // QT_CONFIG(statustip)
         self.player_terminate_button.setText(QCoreApplication.translate("Player", u"Terminate", None))
         self.team_nick_label.setText(QCoreApplication.translate("Player", u"Team ", None))
+#if QT_CONFIG(statustip)
+        self.player_time_counter.setStatusTip(QCoreApplication.translate("Player", u"Remaining time", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(statustip)
+        self.player_scenario_text.setStatusTip(QCoreApplication.translate("Player", u"Main scenario", None))
+#endif // QT_CONFIG(statustip)
+#if QT_CONFIG(statustip)
+        self.player_injects_group.setStatusTip(QCoreApplication.translate("Player", u"Injects", None))
+#endif // QT_CONFIG(statustip)
         self.player_injects_group.setTitle(QCoreApplication.translate("Player", u"Injects", None))
-        self.player_tab.setTabText(self.player_tab.indexOf(self.tab_1), QCoreApplication.translate("Player", u"Tab 1", None))
+        self.player_tab.setTabText(self.player_tab.indexOf(self.tab_1), QCoreApplication.translate("Player", u"Scenario", None))
         self.player_questions_group.setTitle(QCoreApplication.translate("Player", u"Questions", None))
-        self.player_tab.setTabText(self.player_tab.indexOf(self.tab_2), QCoreApplication.translate("Player", u"Tab 2", None))
+        self.player_tab.setTabText(self.player_tab.indexOf(self.tab_2), QCoreApplication.translate("Player", u"Questions", None))
     # retranslateUi
 

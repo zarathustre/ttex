@@ -48,17 +48,3 @@ def add_spin_box(parent, layout, object_name=None):
     if object_name:
         spin_box.setObjectName(object_name)
     layout.addWidget(spin_box)
-
-
-# def add_horizontal_slider(parent, layout, object_name=None, return_condition=False):
-#     slider = QSlider(parent)
-#     slider.setOrientation(Qt.Horizontal)
-#     slider.setFixedWidth(100)
-#     slider.setMinimum(1)
-#     slider.setMaximum(10)
-#     slider.setSingleStep(1)
-#     if object_name:
-#         slider.setObjectName(object_name)
-#     layout.addWidget(slider)
-#     if return_condition:
-#         return slider

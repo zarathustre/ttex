@@ -21,6 +21,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="player_terminate_button">
+       <property name="statusTip">
+        <string>Terminate the session (all entries will be lost)</string>
+       </property>
        <property name="text">
         <string>Terminate</string>
        </property>
@@ -60,25 +63,36 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLCDNumber" name="player_time_counter"/>
+      <widget class="QLCDNumber" name="player_time_counter">
+       <property name="statusTip">
+        <string>Remaining time</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="player_tab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
-       <string>Tab 1</string>
+       <string>Scenario</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QTextBrowser" name="player_scenario_text"/>
+        <widget class="QTextBrowser" name="player_scenario_text">
+         <property name="statusTip">
+          <string>Main scenario</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QGroupBox" name="player_injects_group">
+         <property name="statusTip">
+          <string>Injects</string>
+         </property>
          <property name="title">
           <string>Injects</string>
          </property>
@@ -89,7 +103,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Questions</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>

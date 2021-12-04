@@ -22,6 +22,7 @@ class Ui_MainWindow(object):
         font = QFont()
         font.setPointSize(11)
         MainWindow.setFont(font)
+        MainWindow.setStyleSheet(u"")
         self.actionExit = QAction(MainWindow)
         self.actionExit.setObjectName(u"actionExit")
         self.centralwidget = QWidget(MainWindow)
@@ -79,6 +80,7 @@ class Ui_MainWindow(object):
 
         self.start_scenario_button = QPushButton(self.home_page)
         self.start_scenario_button.setObjectName(u"start_scenario_button")
+        self.start_scenario_button.setToolTipDuration(-1)
 
         self.gridLayout.addWidget(self.start_scenario_button, 4, 1, 1, 1)
 
@@ -110,7 +112,16 @@ class Ui_MainWindow(object):
         self.actionExit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Start a scenario or create a new one", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Welcome to TTXE", None))
+#if QT_CONFIG(statustip)
+        self.create_scenario_button.setStatusTip(QCoreApplication.translate("MainWindow", u"Create a scenario", None))
+#endif // QT_CONFIG(statustip)
         self.create_scenario_button.setText(QCoreApplication.translate("MainWindow", u"Create Scenario", None))
+#if QT_CONFIG(tooltip)
+        self.start_scenario_button.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.start_scenario_button.setStatusTip(QCoreApplication.translate("MainWindow", u"Start a scenario", None))
+#endif // QT_CONFIG(statustip)
         self.start_scenario_button.setText(QCoreApplication.translate("MainWindow", u"Start Scenario", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
     # retranslateUi

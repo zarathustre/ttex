@@ -24,6 +24,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
@@ -132,6 +135,9 @@
         </item>
         <item row="5" column="1">
          <widget class="QPushButton" name="create_scenario_button">
+          <property name="statusTip">
+           <string>Create a scenario</string>
+          </property>
           <property name="text">
            <string>Create Scenario</string>
           </property>
@@ -152,6 +158,15 @@
         </item>
         <item row="4" column="1">
          <widget class="QPushButton" name="start_scenario_button">
+          <property name="toolTip">
+           <string/>
+          </property>
+          <property name="toolTipDuration">
+           <number>-1</number>
+          </property>
+          <property name="statusTip">
+           <string>Start a scenario</string>
+          </property>
           <property name="text">
            <string>Start Scenario</string>
           </property>
